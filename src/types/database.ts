@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      coming_soon_items: {
+        Row: {
+          created_at: string | null
+          eta: string | null
+          id: string
+          name: string
+          notes: string | null
+          variety: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          eta?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          variety?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          eta?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          variety?: string | null
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          created_at: string | null
+          date: string
+          description: string | null
+          id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          description?: string | null
+          id?: string
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          description?: string | null
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           clerk_id: string
@@ -38,6 +89,87 @@ export type Database = {
           id?: string
           name?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      signups: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          interests: string | null
+          name: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          interests?: string | null
+          name?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          interests?: string | null
+          name?: string | null
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          contact_email: string
+          contact_phone: string
+          hours: string
+          id: number
+          stock_updated_at: string | null
+        }
+        Insert: {
+          contact_email?: string
+          contact_phone?: string
+          hours?: string
+          id?: number
+          stock_updated_at?: string | null
+        }
+        Update: {
+          contact_email?: string
+          contact_phone?: string
+          hours?: string
+          id?: number
+          stock_updated_at?: string | null
+        }
+        Relationships: []
+      }
+      stock_items: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          id: string
+          name: string
+          notes: string | null
+          price: string | null
+          stock: number | null
+          variety: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          price?: string | null
+          stock?: number | null
+          variety?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          price?: string | null
+          stock?: number | null
+          variety?: string | null
         }
         Relationships: []
       }

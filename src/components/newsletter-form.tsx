@@ -24,7 +24,23 @@ export default function NewsletterForm() {
       return;
     }
 
-    // TODO: replace with Supabase insert to signups table
+    const res = await fetch("/api/signups", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, interests: data.get("interests") }),
+    });
+
+    if (res.status === 409) {
+      setStatus("success");
+      setMessage("You're already on the list — we'll be in touch!");
+      return;
+    }
+    if (!res.ok) {
+      setStatus("error");
+      setMessage("Something went wrong. Please try again.");
+      return;
+    }
+
     setStatus("success");
     setMessage("You're on the list. We'll be in touch when something good comes in.");
     form.reset();

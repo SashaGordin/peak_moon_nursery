@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import NewsletterForm from "@/components/newsletter-form";
-import { seedData, type StockItem, type ComingSoonItem, type EventItem } from "@/lib/seed-data";
+import { supabaseAdmin } from "@/lib/supabase";
+import type { StockItem, ComingSoonItem, EventItem } from "@/lib/seed-data";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Peak Moon Nursery — Vashon Island",
   description:
     "Peak Moon Nursery — small-batch, NW-grown vegetable starts, herbs, and flowers on Vashon Island. Run by Selena and Keaton.",
 };
-
-// TODO: replace seedData calls with Supabase queries when ready
 
 function StockBadge({ stock }: { stock?: number }) {
   if (stock == null) return null;
@@ -66,11 +67,22 @@ function EventRow({ event }: { event: EventItem }) {
   );
 }
 
-export default function HomePage() {
-  const stock = seedData.in_stock;
-  const coming = seedData.coming_soon;
-  const events = [...seedData.events].sort((a, b) => a.date.localeCompare(b.date));
-  const settings = seedData.settings;
+export default async function HomePage() {
+  const [stockResult, comingResult, eventsResult, settingsResult] = await Promise.all([
+    supabaseAdmin.from("stock_items").select("*").order("created_at", { ascending: false }),
+    supabaseAdmin.from("coming_soon_items").select("*").order("created_at"),
+    supabaseAdmin.from("events").select("*").order("date"),
+    supabaseAdmin.from("site_settings").select("*").single(),
+  ]);
+
+  const stock = (stockResult.data ?? []) as StockItem[];
+  const coming = (comingResult.data ?? []) as ComingSoonItem[];
+  const events = (eventsResult.data ?? []) as EventItem[];
+  const s = settingsResult.data;
+  const settings = {
+    hours: s?.hours ?? "Saturdays & Sundays, 10am–4pm",
+    stockUpdatedAt: s?.stock_updated_at ?? null,
+  };
 
   return (
     <>
