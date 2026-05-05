@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useMemo, type Dispatch, type SetStateAction } from "react";
+import { useState, useRef, useEffect, useMemo, type Dispatch, type SetStateAction } from "react";
 import { useUser, useClerk } from "@clerk/nextjs";
 import {
   type StockItem,
@@ -91,8 +91,21 @@ function StockRow({
 }) {
   const [price, setPrice] = useState(item.price ?? "");
   const [stock, setStock] = useState(String(item.stock ?? ""));
+  const [menuOpen, setMenuOpen] = useState(false);
   const [moving, setMoving] = useState(false);
   const [eta, setEta] = useState("");
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [menuOpen]);
 
   function saveField(field: "price" | "stock") {
     const val = field === "stock" ? (stock === "" ? null : Number(stock)) : (price || null);
@@ -151,18 +164,35 @@ function StockRow({
             </button>
           </div>
         ) : (
-          <button className="icon-btn" onClick={() => setMoving(true)}>
-            → Coming Soon
-          </button>
+          <div className="kebab-menu" ref={menuRef}>
+            <button
+              className="icon-btn kebab-trigger"
+              aria-label="Actions"
+              onClick={() => setMenuOpen((o) => !o)}
+            >
+              ···
+            </button>
+            {menuOpen && (
+              <div className="kebab-dropdown">
+                <button
+                  className="kebab-item"
+                  onClick={() => { setMenuOpen(false); setMoving(true); }}
+                >
+                  → Coming Soon
+                </button>
+                <button
+                  className="kebab-item danger"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    if (confirm(`Remove "${item.name}"?`)) onDelete(item.id);
+                  }}
+                >
+                  Remove
+                </button>
+              </div>
+            )}
+          </div>
         )}
-        <button
-          className="icon-btn danger"
-          onClick={() => {
-            if (confirm(`Remove "${item.name}"?`)) onDelete(item.id);
-          }}
-        >
-          Remove
-        </button>
       </div>
     </div>
   );
