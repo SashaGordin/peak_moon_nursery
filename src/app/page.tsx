@@ -1,7 +1,440 @@
-export default function HomePage() {
+import type { Metadata } from "next";
+import NewsletterForm from "@/components/newsletter-form";
+import { seedData, type StockItem, type ComingSoonItem, type EventItem } from "@/lib/seed-data";
+
+export const metadata: Metadata = {
+  title: "Peak Moon Nursery — Vashon Island",
+  description:
+    "Peak Moon Nursery — small-batch, NW-grown vegetable starts, herbs, and flowers on Vashon Island. Run by Selena and Keaton.",
+};
+
+// TODO: replace seedData calls with Supabase queries when ready
+
+function StockBadge({ stock }: { stock?: number }) {
+  if (stock == null) return null;
+  if (stock <= 0) return <span className="card-stock-out">Sold out</span>;
+  if (stock <= 5) return <span className="card-stock-low">Only {stock} left</span>;
+  return <span>{stock} on the bench</span>;
+}
+
+function PlantCard({ item }: { item: StockItem }) {
   return (
-    <main>
-      <h1>Welcome to {process.env.NEXT_PUBLIC_APP_NAME}</h1>
-    </main>
+    <article className="card">
+      <span className="card-tag">{item.category ?? "Available"}</span>
+      <h3>{item.name}</h3>
+      {item.variety && <p className="card-variety">{item.variety}</p>}
+      {item.notes && <p className="card-notes">{item.notes}</p>}
+      <div className="card-meta">
+        {item.price && <span className="card-price">{item.price}</span>}
+        <StockBadge stock={item.stock} />
+      </div>
+    </article>
+  );
+}
+
+function ComingSoonCard({ item }: { item: ComingSoonItem }) {
+  return (
+    <article className="card">
+      <span className="card-tag">Coming up</span>
+      <h3>{item.name}</h3>
+      {item.variety && <p className="card-variety">{item.variety}</p>}
+      {item.notes && <p className="card-notes">{item.notes}</p>}
+      <div className="card-meta">
+        <span>{item.eta ? `ETA: ${item.eta}` : "Soon"}</span>
+      </div>
+    </article>
+  );
+}
+
+function EventRow({ event }: { event: EventItem }) {
+  const d = event.date ? new Date(event.date + "T12:00:00") : null;
+  const month = d ? d.toLocaleString("en-US", { month: "short" }) : "—";
+  const day = d ? String(d.getDate()) : "?";
+  const year = d ? String(d.getFullYear()) : "";
+  return (
+    <article className="event">
+      <div className="event-date">
+        <div className="month">{month}</div>
+        <div className="day">{day}</div>
+        <div className="year">{year}</div>
+      </div>
+      <div>
+        <h3>{event.title}</h3>
+        {event.description && <p>{event.description}</p>}
+      </div>
+    </article>
+  );
+}
+
+export default function HomePage() {
+  const stock = seedData.in_stock;
+  const coming = seedData.coming_soon;
+  const events = [...seedData.events].sort((a, b) => a.date.localeCompare(b.date));
+  const settings = seedData.settings;
+
+  return (
+    <>
+      <header className="site-header">
+        <div className="wrap header-inner">
+          <a href="#top" className="brand">
+            <svg className="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+              <circle cx="32" cy="32" r="22" fill="none" stroke="currentColor" strokeWidth="2" />
+              <path
+                d="M44 24c-6 2-10 8-10 14 0 5 3 10 8 12-9-1-16-9-16-18 0-7 5-13 12-15 2 2 4 4 6 7z"
+                fill="currentColor"
+              />
+              <path
+                d="M20 44c4-2 7-4 10-7"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                fill="none"
+                strokeLinecap="round"
+              />
+            </svg>
+            <span className="brand-text">
+              <span className="brand-name">Peak Moon</span>
+              <span className="brand-sub">Nursery · Vashon Island</span>
+            </span>
+          </a>
+          <nav className="nav" aria-label="Primary">
+            <a href="#stock">In Stock</a>
+            <a href="#coming-soon">Coming Soon</a>
+            <a href="#visit">Visit</a>
+            <a href="#newsletter">Newsletter</a>
+          </nav>
+        </div>
+      </header>
+
+      <main id="top">
+        {/* HERO */}
+        <section className="hero">
+          <div className="wrap hero-inner">
+            <div className="hero-copy">
+              <p className="eyebrow">Small farm · Vashon Island, WA</p>
+              <h1>
+                Plants grown
+                <br />
+                by the moon,
+                <br />
+                <em>raised on the island.</em>
+              </h1>
+              <p className="lede">
+                Selena and Keaton grow tried-and-true vegetable starts, herbs, and flowers chosen to
+                thrive in the Pacific Northwest — with a soft spot for the unusual varieties you
+                won&apos;t find at the big-box stores.
+              </p>
+              <div className="hero-cta">
+                <a href="#stock" className="btn">
+                  See what&apos;s in stock
+                </a>
+                <a href="#visit" className="btn btn-ghost">
+                  How to find us
+                </a>
+              </div>
+            </div>
+            <div className="hero-art" aria-hidden="true">
+              <svg viewBox="0 0 400 480" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <radialGradient id="moon" cx="50%" cy="40%" r="50%">
+                    <stop offset="0%" stopColor="#fbf3df" />
+                    <stop offset="100%" stopColor="#e8d9b3" />
+                  </radialGradient>
+                </defs>
+                <circle cx="270" cy="150" r="95" fill="url(#moon)" />
+                <circle cx="245" cy="135" r="6" fill="#d8c79e" opacity=".6" />
+                <circle cx="295" cy="170" r="9" fill="#d8c79e" opacity=".5" />
+                <circle cx="280" cy="115" r="4" fill="#d8c79e" opacity=".5" />
+                <path d="M120 460 C 130 360, 140 280, 130 180" stroke="#3d5a3f" strokeWidth="3" fill="none" />
+                <path d="M200 460 C 210 380, 220 320, 215 240" stroke="#3d5a3f" strokeWidth="3" fill="none" />
+                <path d="M80 460 C 90 400, 95 340, 85 290" stroke="#3d5a3f" strokeWidth="3" fill="none" />
+                <g fill="#5b8158">
+                  <path d="M130 320 C 95 300, 85 270, 100 250 C 125 260, 135 285, 130 320 Z" />
+                  <path d="M130 260 C 160 250, 175 225, 165 200 C 140 205, 125 230, 130 260 Z" />
+                  <path d="M215 360 C 180 350, 165 320, 180 300 C 205 305, 220 330, 215 360 Z" />
+                  <path d="M215 290 C 245 280, 260 255, 250 230 C 225 235, 210 260, 215 290 Z" />
+                  <path d="M85 380 C 60 370, 50 345, 60 325 C 80 330, 92 355, 85 380 Z" />
+                </g>
+                <g>
+                  <circle cx="125" cy="180" r="14" fill="#c25b3a" />
+                  <circle cx="118" cy="175" r="3" fill="#e2876a" opacity=".7" />
+                  <path d="M120 168 l3 -6 l3 4 l4 -3 l1 6" stroke="#3d5a3f" strokeWidth="1.5" fill="none" />
+                </g>
+                <g>
+                  <circle cx="215" cy="240" r="12" fill="#c25b3a" />
+                  <path d="M210 230 l3 -5 l3 3 l3 -3" stroke="#3d5a3f" strokeWidth="1.5" fill="none" />
+                </g>
+                <g>
+                  <path d="M85 290 C 78 305, 78 320, 85 330 C 92 320, 92 305, 85 290 Z" fill="#d97441" />
+                  <path d="M82 290 l3 -5 l4 4" stroke="#3d5a3f" strokeWidth="1.5" fill="none" />
+                </g>
+                <path d="M20 462 Q 200 470 380 458" stroke="#8a6f4b" strokeWidth="2" fill="none" opacity=".5" />
+              </svg>
+            </div>
+          </div>
+        </section>
+
+        {/* STORY */}
+        <section className="story">
+          <div className="wrap story-inner">
+            <div className="story-photos">
+              <div className="photo photo-1" data-photo-slot="story-1" aria-label="Photo placeholder">
+                <span className="photo-placeholder">
+                  drop a photo here
+                  <br />
+                  <code>images/story-1.jpg</code>
+                </span>
+              </div>
+              <div className="photo photo-2" data-photo-slot="story-2" aria-label="Photo placeholder">
+                <span className="photo-placeholder">
+                  drop a photo here
+                  <br />
+                  <code>images/story-2.jpg</code>
+                </span>
+              </div>
+              <div className="photo photo-3" data-photo-slot="story-3" aria-label="Photo placeholder">
+                <span className="photo-placeholder">
+                  drop a photo here
+                  <br />
+                  <code>images/story-3.jpg</code>
+                </span>
+              </div>
+            </div>
+            <div className="story-copy">
+              <p className="eyebrow">Our story</p>
+              <h2>A small nursery with a big bench of starts.</h2>
+              <p>
+                Peak Moon is a young, family-run nursery just up the road from the Tahlequah ferry.
+                We grow everything ourselves — over fifty varieties of tomatoes, plus peppers,
+                cucumbers, squash, basil, eggplants, lettuce, flowers, and the occasional oddball we
+                couldn&apos;t resist.
+              </p>
+              <p>
+                We pick varieties that actually do well in our cool, wet springs and our short,
+                beautiful summers. If we put it on the bench, it&apos;s because we&apos;d plant it
+                in our own garden.
+              </p>
+              <p className="signed">— Selena &amp; Keaton</p>
+            </div>
+          </div>
+        </section>
+
+        {/* IN STOCK */}
+        <section id="stock" className="section section-stock">
+          <div className="wrap">
+            <div className="section-head">
+              <p className="eyebrow">This week on the bench</p>
+              <h2>What&apos;s in stock right now</h2>
+              <p className="section-sub">
+                Updated by Selena &amp; Keaton. Quantities are small and things move fast — if you
+                see something you love, swing by soon.
+              </p>
+            </div>
+            <div className="card-grid" aria-live="polite">
+              {stock.length === 0 ? (
+                <div className="empty">
+                  The bench is empty right now — sign up for the newsletter for restock alerts!
+                </div>
+              ) : (
+                stock.map((item) => <PlantCard key={item.id} item={item} />)
+              )}
+            </div>
+            {settings.stockUpdatedAt && (
+              <p className="section-foot">
+                Last updated{" "}
+                {new Date(settings.stockUpdatedAt).toLocaleDateString("en-US", {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
+                })}
+                .
+              </p>
+            )}
+          </div>
+        </section>
+
+        {/* COMING SOON */}
+        <section id="coming-soon" className="section section-coming">
+          <div className="wrap">
+            <div className="section-head">
+              <p className="eyebrow">On deck</p>
+              <h2>Coming up next</h2>
+              <p className="section-sub">
+                A peek at what we&apos;re hardening off in the greenhouse. Sign up below to get an
+                email when these hit the bench.
+              </p>
+            </div>
+            <div className="card-grid card-grid-soft" aria-live="polite">
+              {coming.length === 0 ? (
+                <div className="empty">Nothing announced yet — check back soon.</div>
+              ) : (
+                coming.map((item) => <ComingSoonCard key={item.id} item={item} />)
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* VISIT */}
+        <section id="visit" className="section section-visit">
+          <div className="wrap visit-inner">
+            <div className="visit-copy">
+              <p className="eyebrow">Find us</p>
+              <h2>
+                We&apos;re easy to miss
+                <br />— but worth the turn.
+              </h2>
+              <p>
+                We&apos;re on the west side of Vashon Highway, about a mile and a half up from the
+                Tahlequah ferry. Look for our small wooden sign on the road; the entrance is{" "}
+                <strong>300 feet north of 28815 Vashon Hwy SW</strong>.
+              </p>
+              <dl className="info-grid">
+                <div>
+                  <dt>Address</dt>
+                  <dd>
+                    Near 28815 Vashon Hwy SW
+                    <br />
+                    Vashon, WA 98070
+                  </dd>
+                </div>
+                <div>
+                  <dt>Coordinates</dt>
+                  <dd>
+                    <a
+                      href="https://www.google.com/maps/search/?api=1&query=28815+Vashon+Hwy+SW+Vashon+WA+98070"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Open in Google Maps ↗
+                    </a>
+                  </dd>
+                </div>
+                <div>
+                  <dt>Hours</dt>
+                  <dd>
+                    {settings.hours}
+                    <br />
+                    <span className="muted">(seasonal — check our Instagram for updates)</span>
+                  </dd>
+                </div>
+                <div>
+                  <dt>Contact</dt>
+                  <dd>
+                    <a
+                      href="https://www.instagram.com/peak_moon_nursery/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      @peak_moon_nursery
+                    </a>
+                    <br />
+                    <a
+                      href="https://www.facebook.com/p/Peak-Moon-Nursery-61569684516791/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Facebook
+                    </a>
+                  </dd>
+                </div>
+              </dl>
+              <div className="directions">
+                <h3>From the Tahlequah ferry</h3>
+                <ol>
+                  <li>Drive off the ferry up the hill onto Vashon Highway SW.</li>
+                  <li>
+                    Continue north about <strong>1.5 miles</strong> — the road is the main one, you
+                    can&apos;t really get lost.
+                  </li>
+                  <li>
+                    Watch the <em>left side</em> for our little wooden sign just past 28815. The
+                    driveway is 300 feet north of it.
+                  </li>
+                  <li>
+                    If you reach SW 288th St, you&apos;ve gone slightly too far — turn around.
+                  </li>
+                </ol>
+              </div>
+            </div>
+            <div className="visit-map">
+              <div className="map-frame">
+                <iframe
+                  title="Peak Moon Nursery location map"
+                  src="https://www.google.com/maps?q=28815+Vashon+Hwy+SW,+Vashon,+WA+98070&output=embed"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  allowFullScreen
+                />
+              </div>
+              <a
+                className="map-link"
+                href="https://www.google.com/maps/dir/?api=1&destination=28815+Vashon+Hwy+SW+Vashon+WA+98070"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Get driving directions →
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* NEWSLETTER */}
+        <section id="newsletter" className="section section-newsletter">
+          <div className="wrap newsletter-inner">
+            <div className="newsletter-copy">
+              <p className="eyebrow">Stay in the loop</p>
+              <h2>Email me when something good hits the bench.</h2>
+              <p>
+                We send a short note when new starts come in, when something sells out, and when
+                we&apos;re going to be open. No spam, and you can unsubscribe any time.
+              </p>
+            </div>
+            <NewsletterForm />
+          </div>
+        </section>
+
+        {/* UPCOMING EVENTS */}
+        <section id="events" className="section section-events">
+          <div className="wrap">
+            <div className="section-head">
+              <p className="eyebrow">Calendar</p>
+              <h2>Upcoming open days &amp; events</h2>
+            </div>
+            <div className="event-list" aria-live="polite">
+              {events.length === 0 ? (
+                <div className="empty">No upcoming events on the calendar.</div>
+              ) : (
+                events.map((event) => <EventRow key={event.id} event={event} />)
+              )}
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="site-footer">
+        <div className="wrap footer-inner">
+          <div>
+            <p className="brand-name footer-brand">Peak Moon Nursery</p>
+            <p className="muted">Vashon Island · grown by Selena &amp; Keaton</p>
+          </div>
+          <div className="footer-links">
+            <a
+              href="https://www.instagram.com/peak_moon_nursery/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Instagram
+            </a>
+            <a
+              href="https://www.facebook.com/p/Peak-Moon-Nursery-61569684516791/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Facebook
+            </a>
+            <a href="/admin">Owner login</a>
+          </div>
+        </div>
+      </footer>
+    </>
   );
 }
