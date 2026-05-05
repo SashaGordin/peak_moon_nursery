@@ -734,6 +734,23 @@ button.btn { font-family: inherit; }
   box-shadow: 0 0 0 2px rgba(184, 92, 58, 0.18);
 }
 
+.move-eta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.move-eta input {
+  font-family: var(--body);
+  font-size: 13px;
+  padding: 5px 8px;
+  background: var(--paper);
+  border: 1px solid var(--terracotta);
+  border-radius: 6px;
+  outline: none;
+  width: 140px;
+  color: var(--ink);
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 880px) {
   .hero { padding-top: 48px; }

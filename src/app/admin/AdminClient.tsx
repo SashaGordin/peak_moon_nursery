@@ -82,13 +82,17 @@ function StockRow({
   item,
   onUpdate,
   onDelete,
+  onMove,
 }: {
   item: StockItem;
   onUpdate: (id: string, patch: Partial<StockItem>) => void;
   onDelete: (id: string) => void;
+  onMove: (id: string, eta: string) => void;
 }) {
   const [price, setPrice] = useState(item.price ?? "");
   const [stock, setStock] = useState(String(item.stock ?? ""));
+  const [moving, setMoving] = useState(false);
+  const [eta, setEta] = useState("");
 
   function saveField(field: "price" | "stock") {
     const val = field === "stock" ? (stock === "" ? null : Number(stock)) : (price || null);
@@ -127,6 +131,30 @@ function StockRow({
         </label>
       </div>
       <div className="row-actions">
+        {moving ? (
+          <div className="move-eta">
+            <input
+              autoFocus
+              value={eta}
+              onChange={(e) => setEta(e.target.value)}
+              placeholder="ETA (e.g. Next week)"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") { onMove(item.id, eta); setMoving(false); }
+                if (e.key === "Escape") { setMoving(false); setEta(""); }
+              }}
+            />
+            <button className="icon-btn" onClick={() => { onMove(item.id, eta); setMoving(false); }}>
+              Confirm
+            </button>
+            <button className="icon-btn" onClick={() => { setMoving(false); setEta(""); }}>
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <button className="icon-btn" onClick={() => setMoving(true)}>
+            → Coming Soon
+          </button>
+        )}
         <button
           className="icon-btn danger"
           onClick={() => {
@@ -178,6 +206,27 @@ function StockTab({
         in_stock: prev.in_stock.map((i) => (i.id === id ? { ...i, ...updated } : i)),
       }));
       showToast("Saved.");
+    } catch (err) {
+      showToast((err as Error).message, "error");
+    }
+  }
+
+  async function handleMove(id: string, eta: string) {
+    const item = store.in_stock.find((i) => i.id === id);
+    if (!item) return;
+    try {
+      const created = await apiPost("/api/admin/coming-soon", {
+        name: item.name,
+        notes: item.description ?? item.notes ?? null,
+        eta: eta || null,
+      });
+      await apiDelete(`/api/admin/stock/${id}`);
+      setStore((prev) => ({
+        ...prev,
+        in_stock: prev.in_stock.filter((i) => i.id !== id),
+        coming_soon: [...prev.coming_soon, created],
+      }));
+      showToast(`Moved "${item.name}" to Coming Soon.`);
     } catch (err) {
       showToast((err as Error).message, "error");
     }
@@ -309,6 +358,7 @@ function StockTab({
                 item={item}
                 onUpdate={handleUpdate}
                 onDelete={handleDelete}
+                onMove={handleMove}
               />
             ))
           )}
