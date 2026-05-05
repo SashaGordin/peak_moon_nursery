@@ -6,6 +6,10 @@ export type StockItem = {
   price?: string;
   stock?: number;
   category?: string;
+  description?: string;
+  mature_height?: string;
+  days_to_maturity?: string;
+  growth_type?: string;
 };
 
 export type ComingSoonItem = {

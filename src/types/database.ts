@@ -144,7 +144,11 @@ export type Database = {
         Row: {
           category: string | null
           created_at: string | null
+          days_to_maturity: string | null
+          description: string | null
+          growth_type: string | null
           id: string
+          mature_height: string | null
           name: string
           notes: string | null
           price: string | null
@@ -154,7 +158,11 @@ export type Database = {
         Insert: {
           category?: string | null
           created_at?: string | null
+          days_to_maturity?: string | null
+          description?: string | null
+          growth_type?: string | null
           id?: string
+          mature_height?: string | null
           name: string
           notes?: string | null
           price?: string | null
@@ -164,7 +172,11 @@ export type Database = {
         Update: {
           category?: string | null
           created_at?: string | null
+          days_to_maturity?: string | null
+          description?: string | null
+          growth_type?: string | null
           id?: string
+          mature_height?: string | null
           name?: string
           notes?: string | null
           price?: string | null

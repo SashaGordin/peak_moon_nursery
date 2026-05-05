@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import NewsletterForm from "@/components/newsletter-form";
+import StockSection from "@/components/stock-section";
 import { supabaseAdmin } from "@/lib/supabase";
 import type { StockItem, ComingSoonItem, EventItem } from "@/lib/seed-data";
 
@@ -10,28 +11,6 @@ export const metadata: Metadata = {
   description:
     "Peak Moon Nursery — small-batch, NW-grown vegetable starts, herbs, and flowers on Vashon Island. Run by Selena and Keaton.",
 };
-
-function StockBadge({ stock }: { stock?: number }) {
-  if (stock == null) return null;
-  if (stock <= 0) return <span className="card-stock-out">Sold out</span>;
-  if (stock <= 5) return <span className="card-stock-low">Only {stock} left</span>;
-  return <span>{stock} on the bench</span>;
-}
-
-function PlantCard({ item }: { item: StockItem }) {
-  return (
-    <article className="card">
-      <span className="card-tag">{item.category ?? "Available"}</span>
-      <h3>{item.name}</h3>
-      {item.variety && <p className="card-variety">{item.variety}</p>}
-      {item.notes && <p className="card-notes">{item.notes}</p>}
-      <div className="card-meta">
-        {item.price && <span className="card-price">{item.price}</span>}
-        <StockBadge stock={item.stock} />
-      </div>
-    </article>
-  );
-}
 
 function ComingSoonCard({ item }: { item: ComingSoonItem }) {
   return (
@@ -241,15 +220,13 @@ export default async function HomePage() {
                 see something you love, swing by soon.
               </p>
             </div>
-            <div className="card-grid" aria-live="polite">
-              {stock.length === 0 ? (
-                <div className="empty">
-                  The bench is empty right now — sign up for the newsletter for restock alerts!
-                </div>
-              ) : (
-                stock.map((item) => <PlantCard key={item.id} item={item} />)
-              )}
-            </div>
+            {stock.length === 0 ? (
+              <div className="empty">
+                The bench is empty right now — sign up for the newsletter for restock alerts!
+              </div>
+            ) : (
+              <StockSection items={stock} />
+            )}
             {settings.stockUpdatedAt && (
               <p className="section-foot">
                 Last updated{" "}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo, type Dispatch, type SetStateAction } from "react";
 import { useUser, useClerk } from "@clerk/nextjs";
 import {
   type StockItem,
@@ -9,6 +9,20 @@ import {
   type SignupItem,
   type SiteSettings,
 } from "@/lib/seed-data";
+
+const STOCK_CATEGORIES = [
+  "Arugula", "Basil", "Beans", "Beets", "Bitter Melon", "Broccoli",
+  "Cabbage", "Calendula", "Cauliflower", "Celeriac", "Chamomile", "Chard",
+  "Chicory", "Chives", "Chrysanthemum Greens", "Cilantro", "Collard",
+  "Cosmos", "Cucumber", "Cumin", "Dill", "Echinacea", "Eggplant",
+  "Endive", "Epazote", "Fennel", "Fenugreek", "Hibiscus", "Kale",
+  "Leek", "Lemongrass", "Lettuce", "Marigold", "Melon", "Mint",
+  "Mustard", "Nasturium", "Okra", "Onion", "Oregano", "Parsley",
+  "Peas", "Pepper", "Poppies", "Pumpkin", "Radicchio", "Sage",
+  "Shallot", "Shiso", "Spinach", "Squash", "Sunflowers", "Sweet Peas",
+  "Tatsoi", "Thyme", "Tomatillo", "Tomato", "Watermelon", "Yarrow",
+  "Zinnia", "Other",
+];
 
 type TabId = "stock" | "coming" | "events" | "settings" | "signups";
 
@@ -64,6 +78,251 @@ function AdminRow({
   );
 }
 
+function StockRow({
+  item,
+  onUpdate,
+  onDelete,
+}: {
+  item: StockItem;
+  onUpdate: (id: string, patch: Partial<StockItem>) => void;
+  onDelete: (id: string) => void;
+}) {
+  const [price, setPrice] = useState(item.price ?? "");
+  const [stock, setStock] = useState(String(item.stock ?? ""));
+
+  function saveField(field: "price" | "stock") {
+    const val = field === "stock" ? (stock === "" ? null : Number(stock)) : (price || null);
+    onUpdate(item.id, { [field]: val });
+  }
+
+  return (
+    <div className="admin-row stock-row">
+      <div className="row-name">
+        {item.name}
+        {item.category && <em>{item.category}</em>}
+      </div>
+      <div className="muted" style={{ fontSize: 13 }}>{item.description ? item.description.slice(0, 80) + (item.description.length > 80 ? "…" : "") : ""}</div>
+      <div className="inline-fields">
+        <label className="inline-field">
+          <span>Price</span>
+          <input
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            onBlur={() => saveField("price")}
+            onKeyDown={(e) => { if (e.key === "Enter") { (e.target as HTMLInputElement).blur(); } }}
+            placeholder="$5"
+          />
+        </label>
+        <label className="inline-field">
+          <span>Qty</span>
+          <input
+            type="number"
+            min="0"
+            value={stock}
+            onChange={(e) => setStock(e.target.value)}
+            onBlur={() => saveField("stock")}
+            onKeyDown={(e) => { if (e.key === "Enter") { (e.target as HTMLInputElement).blur(); } }}
+            placeholder="10"
+          />
+        </label>
+      </div>
+      <div className="row-actions">
+        <button
+          className="icon-btn danger"
+          onClick={() => {
+            if (confirm(`Remove "${item.name}"?`)) onDelete(item.id);
+          }}
+        >
+          Remove
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function StockTab({
+  store,
+  setStore,
+  showToast,
+  apiPost,
+  apiPatch,
+  apiDelete,
+}: {
+  store: Store;
+  setStore: Dispatch<SetStateAction<Store>>;
+  showToast: (t: string, k?: "ok" | "error") => void;
+  apiPost: (path: string, body: unknown) => Promise<StockItem>;
+  apiPatch: (path: string, body: unknown) => Promise<StockItem>;
+  apiDelete: (path: string) => Promise<void>;
+}) {
+  const [search, setSearch] = useState("");
+  const [filterCat, setFilterCat] = useState("");
+
+  const filtered = useMemo(() => {
+    let list = store.in_stock;
+    if (filterCat) list = list.filter((i) => i.category === filterCat);
+    if (search) {
+      const q = search.toLowerCase();
+      list = list.filter(
+        (i) => i.name.toLowerCase().includes(q) || (i.category ?? "").toLowerCase().includes(q)
+      );
+    }
+    return list;
+  }, [store.in_stock, filterCat, search]);
+
+  async function handleUpdate(id: string, patch: Partial<StockItem>) {
+    try {
+      const updated = await apiPatch(`/api/admin/stock/${id}`, patch);
+      setStore((prev) => ({
+        ...prev,
+        in_stock: prev.in_stock.map((i) => (i.id === id ? { ...i, ...updated } : i)),
+      }));
+      showToast("Saved.");
+    } catch (err) {
+      showToast((err as Error).message, "error");
+    }
+  }
+
+  async function handleDelete(id: string) {
+    try {
+      await apiDelete(`/api/admin/stock/${id}`);
+      setStore((prev) => ({ ...prev, in_stock: prev.in_stock.filter((i) => i.id !== id) }));
+      showToast("Removed.");
+    } catch (err) {
+      showToast((err as Error).message, "error");
+    }
+  }
+
+  return (
+    <section>
+      <div className="admin-card">
+        <h2>Add a plant to the bench</h2>
+        <p className="hint">Anything saved here shows up on the public site.</p>
+        <form
+          className="admin-form"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const fd = new FormData(e.currentTarget);
+            const form = e.currentTarget;
+            const body = {
+              name: fd.get("name") as string,
+              category: (fd.get("category") as string) || null,
+              description: (fd.get("description") as string) || null,
+              mature_height: (fd.get("mature_height") as string) || null,
+              days_to_maturity: (fd.get("days_to_maturity") as string) || null,
+              growth_type: (fd.get("growth_type") as string) || null,
+              price: (fd.get("price") as string) || "$5",
+              stock: fd.get("stock") ? Number(fd.get("stock")) : 10,
+              notes: (fd.get("notes") as string) || null,
+            };
+            try {
+              const saved = await apiPost("/api/admin/stock", body);
+              setStore((prev) => ({ ...prev, in_stock: [saved, ...prev.in_stock] }));
+              showToast("Saved.");
+              form.reset();
+            } catch (err) {
+              showToast((err as Error).message, "error");
+            }
+          }}
+        >
+          <label>
+            <span className="lbl">Name</span>
+            <input name="name" placeholder="Cherokee Purple Tomato" required />
+          </label>
+          <label>
+            <span className="lbl">Category</span>
+            <select name="category">
+              <option value="">— pick one —</option>
+              {STOCK_CATEGORIES.map((c) => <option key={c}>{c}</option>)}
+            </select>
+          </label>
+          <label className="field-full">
+            <span className="lbl">Description</span>
+            <input name="description" placeholder="A short description of this variety." />
+          </label>
+          <label>
+            <span className="lbl">Mature height</span>
+            <input name="mature_height" placeholder="18-24 inches" />
+          </label>
+          <label>
+            <span className="lbl">Days to maturity</span>
+            <input name="days_to_maturity" placeholder="75 days" />
+          </label>
+          <label>
+            <span className="lbl">Growth type</span>
+            <select name="growth_type">
+              <option value="">—</option>
+              {["Determinate", "Indeterminate", "Annual", "Perennial"].map((g) => (
+                <option key={g}>{g}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            <span className="lbl">Price</span>
+            <input name="price" placeholder="$5" defaultValue="$5" />
+          </label>
+          <label>
+            <span className="lbl">Quantity on bench</span>
+            <input name="stock" type="number" min="0" placeholder="10" defaultValue="10" />
+          </label>
+          <label className="field-full">
+            <span className="lbl">Notes</span>
+            <input name="notes" placeholder="Optional extra note for customers." />
+          </label>
+          <div className="form-actions">
+            <button type="submit" className="btn">Save</button>
+            <button type="reset" className="btn btn-secondary">Clear</button>
+          </div>
+        </form>
+      </div>
+
+      <div className="admin-card">
+        <h2>
+          On the bench right now
+          <span className="muted" style={{ fontSize: 16, fontWeight: 400, marginLeft: 10 }}>
+            ({store.in_stock.length} plants)
+          </span>
+        </h2>
+        <div className="stock-filters">
+          <input
+            className="stock-search"
+            placeholder="Search by name or category…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <select
+            className="stock-cat-filter"
+            value={filterCat}
+            onChange={(e) => setFilterCat(e.target.value)}
+          >
+            <option value="">All categories</option>
+            {STOCK_CATEGORIES.map((c) => <option key={c}>{c}</option>)}
+          </select>
+        </div>
+        <div className="admin-list">
+          {filtered.length === 0 ? (
+            <div className="empty">No plants match your filter.</div>
+          ) : (
+            filtered.map((item) => (
+              <StockRow
+                key={item.id}
+                item={item}
+                onUpdate={handleUpdate}
+                onDelete={handleDelete}
+              />
+            ))
+          )}
+        </div>
+        {filtered.length < store.in_stock.length && (
+          <p className="muted" style={{ fontSize: 13, marginTop: 10 }}>
+            Showing {filtered.length} of {store.in_stock.length} plants.
+          </p>
+        )}
+      </div>
+    </section>
+  );
+}
+
 function Toast({ text, kind }: { text: string; kind: "ok" | "error" }) {
   return (
     <div className={`toast show${kind === "error" ? " error" : ""}`} role="status">
@@ -102,6 +361,19 @@ export default function AdminClient({
   async function apiPost(path: string, body: unknown) {
     const res = await fetch(path, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error ?? "Request failed");
+    }
+    return res.json();
+  }
+
+  async function apiPatch(path: string, body: unknown) {
+    const res = await fetch(path, {
+      method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
@@ -183,99 +455,14 @@ export default function AdminClient({
 
       {/* STOCK TAB */}
       {activeTab === "stock" && (
-        <section>
-          <div className="admin-card">
-            <h2>Add a plant to the bench</h2>
-            <p className="hint">Anything saved here shows up on the public site.</p>
-            <form
-              className="admin-form"
-              onSubmit={async (e) => {
-                e.preventDefault();
-                const fd = new FormData(e.currentTarget);
-                const form = e.currentTarget;
-                const body = {
-                  name: fd.get("name") as string,
-                  variety: (fd.get("variety") as string) || null,
-                  category: (fd.get("category") as string) || null,
-                  price: (fd.get("price") as string) || null,
-                  stock: fd.get("stock") ? Number(fd.get("stock")) : null,
-                  notes: (fd.get("notes") as string) || null,
-                };
-                try {
-                  const saved = await apiPost("/api/admin/stock", body);
-                  setStore((prev) => ({ ...prev, in_stock: [saved, ...prev.in_stock] }));
-                  showToast("Saved.");
-                  form.reset();
-                } catch (err) {
-                  showToast((err as Error).message, "error");
-                }
-              }}
-            >
-              <label>
-                <span className="lbl">Name</span>
-                <input name="name" placeholder="Cherokee Purple Tomato" required />
-              </label>
-              <label>
-                <span className="lbl">Variety / type</span>
-                <input name="variety" placeholder="Heirloom · indeterminate" />
-              </label>
-              <label>
-                <span className="lbl">Category</span>
-                <select name="category">
-                  <option value="">— pick one —</option>
-                  {["Tomato","Pepper","Squash","Greens","Herb","Flower","Other"].map((c) => (
-                    <option key={c}>{c}</option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                <span className="lbl">Price</span>
-                <input name="price" placeholder="$5" />
-              </label>
-              <label>
-                <span className="lbl">Quantity on bench</span>
-                <input name="stock" type="number" min="0" placeholder="12" />
-              </label>
-              <label className="field-full">
-                <span className="lbl">
-                  Notes <span style={{ fontWeight: 400 }}>(one short sentence)</span>
-                </span>
-                <input name="notes" placeholder="Smoky, sweet, big slicer." />
-              </label>
-              <div className="form-actions">
-                <button type="submit" className="btn">Save</button>
-                <button type="reset" className="btn btn-secondary">Clear</button>
-              </div>
-            </form>
-          </div>
-          <div className="admin-card">
-            <h2>On the bench right now</h2>
-            <div className="admin-list">
-              {store.in_stock.length === 0 ? (
-                <div className="empty">Nothing here yet.</div>
-              ) : (
-                store.in_stock.map((item) => (
-                  <AdminRow
-                    key={item.id}
-                    primary={item.name}
-                    secondary={item.variety}
-                    tertiary={item.notes}
-                    badge={[item.category, item.price, item.stock != null ? `${item.stock} on bench` : ""].filter(Boolean).join(" · ")}
-                    onDelete={async () => {
-                      try {
-                        await apiDelete(`/api/admin/stock/${item.id}`);
-                        setStore((prev) => ({ ...prev, in_stock: prev.in_stock.filter((i) => i.id !== item.id) }));
-                        showToast("Removed.");
-                      } catch (err) {
-                        showToast((err as Error).message, "error");
-                      }
-                    }}
-                  />
-                ))
-              )}
-            </div>
-          </div>
-        </section>
+        <StockTab
+          store={store}
+          setStore={setStore}
+          showToast={showToast}
+          apiPost={apiPost}
+          apiPatch={apiPatch}
+          apiDelete={apiDelete}
+        />
       )}
 
       {/* COMING SOON TAB */}
