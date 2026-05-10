@@ -262,6 +262,7 @@ export default function WholesaleOrderClient({ token, accountName, accountEmail,
               <span style={{ fontSize: "13px", color: "#555", display: "block", marginBottom: "4px" }}>Name / Business *</span>
               <input
                 required
+                maxLength={200}
                 value={buyerName}
                 onChange={(e) => setBuyerName(e.target.value)}
                 style={{ width: "100%", padding: "8px 10px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "14px", boxSizing: "border-box" }}
@@ -273,6 +274,7 @@ export default function WholesaleOrderClient({ token, accountName, accountEmail,
               <input
                 required
                 type="email"
+                maxLength={254}
                 value={buyerEmail}
                 onChange={(e) => setBuyerEmail(e.target.value)}
                 style={{ width: "100%", padding: "8px 10px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "14px", boxSizing: "border-box" }}
@@ -283,6 +285,7 @@ export default function WholesaleOrderClient({ token, accountName, accountEmail,
               <span style={{ fontSize: "13px", color: "#555", display: "block", marginBottom: "4px" }}>Phone (optional)</span>
               <input
                 type="tel"
+                maxLength={30}
                 value={buyerPhone}
                 onChange={(e) => setBuyerPhone(e.target.value)}
                 style={{ width: "100%", padding: "8px 10px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "14px", boxSizing: "border-box" }}
@@ -295,6 +298,7 @@ export default function WholesaleOrderClient({ token, accountName, accountEmail,
                 value={orderNotes}
                 onChange={(e) => setOrderNotes(e.target.value)}
                 rows={3}
+                maxLength={2000}
                 placeholder="Anything we should know — preferred pickup time, substitutions, etc."
                 style={{ width: "100%", padding: "8px 10px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "14px", resize: "vertical", boxSizing: "border-box" }}
               />
