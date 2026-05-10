@@ -1,16 +1,18 @@
 import { supabaseAdmin } from "@/lib/supabase";
 import AdminClient from "./AdminClient";
-import type { StockItem, ComingSoonItem, EventItem, SignupItem, SiteSettings } from "@/lib/seed-data";
+import type { StockItem, ComingSoonItem, EventItem, SignupItem, SiteSettings, WholesaleToken, WholesaleOrder } from "@/lib/seed-data";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
-  const [stock, coming, events, settings, signups] = await Promise.all([
+  const [stock, coming, events, settings, signups, tokens, orders] = await Promise.all([
     supabaseAdmin.from("stock_items").select("*").order("created_at", { ascending: false }),
     supabaseAdmin.from("coming_soon_items").select("*").order("created_at"),
     supabaseAdmin.from("events").select("*").order("date"),
     supabaseAdmin.from("site_settings").select("*").single(),
     supabaseAdmin.from("signups").select("*").order("created_at", { ascending: false }),
+    supabaseAdmin.from("wholesale_tokens").select("*").order("created_at", { ascending: false }),
+    supabaseAdmin.from("wholesale_orders").select("*, wholesale_tokens(name)").order("created_at", { ascending: false }),
   ]);
 
   const s = settings.data;
@@ -36,6 +38,8 @@ export default async function AdminPage() {
       initialEvents={(events.data ?? []) as EventItem[]}
       initialSettings={mappedSettings}
       initialSignups={mappedSignups}
+      initialWholesaleTokens={(tokens.data ?? []) as WholesaleToken[]}
+      initialWholesaleOrders={(orders.data ?? []) as WholesaleOrder[]}
     />
   );
 }

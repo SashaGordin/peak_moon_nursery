@@ -43,6 +43,29 @@ export type SignupItem = {
   createdAt?: string;
 };
 
+export type WholesaleToken = {
+  id: string;
+  token: string;
+  name: string;
+  email?: string | null;
+  notes?: string | null;
+  active: boolean;
+  created_at: string;
+};
+
+export type WholesaleOrder = {
+  id: string;
+  token_id?: string | null;
+  buyer_name: string;
+  buyer_email: string;
+  buyer_phone?: string | null;
+  notes?: string | null;
+  items: Array<{ id: string; name: string; category?: string; price?: string; requested_qty: number }>;
+  status: string;
+  created_at: string;
+  wholesale_tokens?: { name: string } | null;
+};
+
 export const seedData = {
   in_stock: [
     { id: "s1", name: "Cherokee Purple Tomato", variety: "Heirloom · indeterminate", notes: "Smoky, sweet, big slicer. A bench favorite.", price: "$5", stock: 12, category: "Tomato" },

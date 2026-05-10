@@ -188,6 +188,80 @@ export type Database = {
         }
         Relationships: []
       }
+      wholesale_orders: {
+        Row: {
+          buyer_email: string
+          buyer_name: string
+          buyer_phone: string | null
+          created_at: string | null
+          id: string
+          items: Json
+          notes: string | null
+          status: string
+          token_id: string | null
+        }
+        Insert: {
+          buyer_email: string
+          buyer_name: string
+          buyer_phone?: string | null
+          created_at?: string | null
+          id?: string
+          items: Json
+          notes?: string | null
+          status?: string
+          token_id?: string | null
+        }
+        Update: {
+          buyer_email?: string
+          buyer_name?: string
+          buyer_phone?: string | null
+          created_at?: string | null
+          id?: string
+          items?: Json
+          notes?: string | null
+          status?: string
+          token_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_orders_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "wholesale_tokens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wholesale_tokens: {
+        Row: {
+          active: boolean
+          created_at: string | null
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          token: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          token?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          token?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

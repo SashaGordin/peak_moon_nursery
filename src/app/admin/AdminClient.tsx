@@ -8,6 +8,8 @@ import {
   type EventItem,
   type SignupItem,
   type SiteSettings,
+  type WholesaleToken,
+  type WholesaleOrder,
 } from "@/lib/seed-data";
 
 const STOCK_CATEGORIES = [
@@ -24,7 +26,7 @@ const STOCK_CATEGORIES = [
   "Zinnia", "Other",
 ];
 
-type TabId = "stock" | "coming" | "events" | "settings" | "signups";
+type TabId = "stock" | "coming" | "events" | "settings" | "signups" | "wholesale";
 
 type Store = {
   in_stock: StockItem[];
@@ -32,6 +34,8 @@ type Store = {
   events: EventItem[];
   signups: SignupItem[];
   settings: SiteSettings;
+  wholesale_tokens: WholesaleToken[];
+  wholesale_orders: WholesaleOrder[];
 };
 
 type Props = {
@@ -40,6 +44,8 @@ type Props = {
   initialEvents: EventItem[];
   initialSettings: SiteSettings;
   initialSignups: SignupItem[];
+  initialWholesaleTokens: WholesaleToken[];
+  initialWholesaleOrders: WholesaleOrder[];
 };
 
 function AdminRow({
@@ -387,6 +393,136 @@ function StockTab({
   );
 }
 
+function WholesaleTokenRow({
+  token,
+  onToggle,
+  onDelete,
+}: {
+  token: WholesaleToken;
+  onToggle: () => void;
+  onDelete: () => void;
+}) {
+  const [copied, setCopied] = useState(false);
+  const appUrl = typeof window !== "undefined" ? window.location.origin : "";
+  const link = `${appUrl}/order/${token.token}`;
+
+  function copy() {
+    navigator.clipboard.writeText(link).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  return (
+    <div className="admin-row" style={{ alignItems: "flex-start", gap: "0.75rem", flexWrap: "wrap" }}>
+      <div className="row-name" style={{ flex: "1 1 200px" }}>
+        {token.name}
+        {token.email && <em>{token.email}</em>}
+        {token.notes && <em style={{ color: "#999" }}>{token.notes}</em>}
+      </div>
+      <div style={{ flex: "1 1 260px", fontSize: "12px", color: "#888", wordBreak: "break-all", fontFamily: "monospace" }}>
+        {link}
+      </div>
+      <div className="row-actions" style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
+        <button className="icon-btn" onClick={copy}>
+          {copied ? "Copied!" : "Copy link"}
+        </button>
+        <button
+          className={`icon-btn${token.active ? "" : " danger"}`}
+          onClick={onToggle}
+        >
+          {token.active ? "Deactivate" : "Activate"}
+        </button>
+        <button className="icon-btn danger" onClick={onDelete}>Remove</button>
+        <span style={{ fontSize: "12px", color: token.active ? "#4a7c59" : "#999" }}>
+          {token.active ? "Active" : "Inactive"}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+const ORDER_STATUSES = ["pending", "confirmed", "fulfilled", "cancelled"] as const;
+const STATUS_COLORS: Record<string, string> = {
+  pending: "#c07b1a",
+  confirmed: "#4a7c59",
+  fulfilled: "#555",
+  cancelled: "#c0392b",
+};
+
+function WholesaleOrderRow({
+  order,
+  onStatusChange,
+}: {
+  order: WholesaleOrder;
+  onStatusChange: (status: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const totalQty = order.items.reduce((s, i) => s + i.requested_qty, 0);
+
+  return (
+    <div style={{ borderBottom: "1px solid #f0ece6" }}>
+      <div className="admin-row" style={{ alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
+        <div className="row-name" style={{ flex: "1 1 180px" }}>
+          {order.buyer_name}
+          <em>{order.buyer_email}</em>
+        </div>
+        <div style={{ flex: "0 0 auto", fontSize: "13px", color: "#666" }}>
+          {order.items.length} {order.items.length === 1 ? "variety" : "varieties"} · {totalQty} starts
+        </div>
+        <div style={{ flex: "0 0 auto", fontSize: "12px", color: "#888" }}>
+          {new Date(order.created_at).toLocaleDateString()}
+        </div>
+        <div style={{ flex: "0 0 auto" }}>
+          <span style={{ fontSize: "12px", fontWeight: 600, color: STATUS_COLORS[order.status] ?? "#555", textTransform: "capitalize" }}>
+            {order.status}
+          </span>
+        </div>
+        <div className="row-actions" style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+          <select
+            value={order.status}
+            onChange={(e) => onStatusChange(e.target.value)}
+            style={{ fontSize: "12px", padding: "2px 6px", border: "1px solid #ccc", borderRadius: "4px" }}
+          >
+            {ORDER_STATUSES.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+          <button className="icon-btn" onClick={() => setOpen((o) => !o)}>
+            {open ? "Hide" : "Details"}
+          </button>
+        </div>
+      </div>
+      {open && (
+        <div style={{ padding: "0.75rem 1rem 1rem", background: "#faf9f7", fontSize: "13px" }}>
+          {order.buyer_phone && <p style={{ margin: "0 0 6px" }}>Phone: {order.buyer_phone}</p>}
+          {order.notes && <p style={{ margin: "0 0 10px", color: "#555" }}>Notes: {order.notes}</p>}
+          <table style={{ borderCollapse: "collapse", width: "100%" }}>
+            <thead>
+              <tr style={{ color: "#888" }}>
+                <th style={{ textAlign: "left", padding: "3px 12px 3px 0", fontWeight: "normal" }}>Plant</th>
+                <th style={{ textAlign: "left", padding: "3px 8px", fontWeight: "normal" }}>Category</th>
+                <th style={{ textAlign: "left", padding: "3px 8px", fontWeight: "normal" }}>Price</th>
+                <th style={{ textAlign: "left", padding: "3px 0", fontWeight: "normal" }}>Qty</th>
+              </tr>
+            </thead>
+            <tbody>
+              {order.items.map((item, idx) => (
+                <tr key={idx} style={{ borderTop: "1px solid #ece8e2" }}>
+                  <td style={{ padding: "4px 12px 4px 0" }}>{item.name}</td>
+                  <td style={{ padding: "4px 8px", color: "#666" }}>{item.category ?? "—"}</td>
+                  <td style={{ padding: "4px 8px", color: "#666" }}>{item.price ?? "—"}</td>
+                  <td style={{ padding: "4px 0", fontWeight: 500 }}>{item.requested_qty}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Toast({ text, kind }: { text: string; kind: "ok" | "error" }) {
   return (
     <div className={`toast show${kind === "error" ? " error" : ""}`} role="status">
@@ -401,6 +537,8 @@ export default function AdminClient({
   initialEvents,
   initialSettings,
   initialSignups,
+  initialWholesaleTokens,
+  initialWholesaleOrders,
 }: Props) {
   const { user } = useUser();
   const { signOut } = useClerk();
@@ -414,6 +552,8 @@ export default function AdminClient({
     events: [...initialEvents].sort((a, b) => a.date.localeCompare(b.date)),
     signups: initialSignups,
     settings: initialSettings,
+    wholesale_tokens: initialWholesaleTokens,
+    wholesale_orders: initialWholesaleOrders,
   });
 
   function showToast(text: string, kind: "ok" | "error" = "ok") {
@@ -482,6 +622,7 @@ export default function AdminClient({
     { id: "events", label: "Events" },
     { id: "settings", label: "Site settings" },
     { id: "signups", label: "Newsletter" },
+    { id: "wholesale", label: "Wholesale" },
   ];
 
   return (
@@ -773,6 +914,116 @@ export default function AdminClient({
                         await apiDelete(`/api/admin/signups/${s.id}`);
                         setStore((prev) => ({ ...prev, signups: prev.signups.filter((i) => i.id !== s.id) }));
                         showToast("Removed.");
+                      } catch (err) {
+                        showToast((err as Error).message, "error");
+                      }
+                    }}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* WHOLESALE TAB */}
+      {activeTab === "wholesale" && (
+        <section>
+          {/* Access Links */}
+          <div className="admin-card">
+            <h2>Wholesale access links</h2>
+            <p className="hint">Each link gives a buyer private access to the order form. Share it directly — no login required.</p>
+            <form
+              className="admin-form"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const fd = new FormData(e.currentTarget);
+                const form = e.currentTarget;
+                const body = {
+                  name: fd.get("name") as string,
+                  email: (fd.get("email") as string) || null,
+                  notes: (fd.get("notes") as string) || null,
+                };
+                try {
+                  const saved = await apiPost("/api/admin/wholesale/tokens", body);
+                  setStore((prev) => ({ ...prev, wholesale_tokens: [saved, ...prev.wholesale_tokens] }));
+                  showToast("Link created.");
+                  form.reset();
+                } catch (err) {
+                  showToast((err as Error).message, "error");
+                }
+              }}
+            >
+              <label>
+                <span className="lbl">Name / Business *</span>
+                <input name="name" placeholder="Island Farm Co." required />
+              </label>
+              <label>
+                <span className="lbl">Email</span>
+                <input name="email" type="email" placeholder="buyer@example.com" />
+              </label>
+              <label className="field-full">
+                <span className="lbl">Notes</span>
+                <input name="notes" placeholder="Internal notes (not shown to buyer)" />
+              </label>
+              <div className="form-actions">
+                <button type="submit" className="btn">Create link</button>
+                <button type="reset" className="btn btn-secondary">Clear</button>
+              </div>
+            </form>
+          </div>
+
+          <div className="admin-card">
+            <h2>Active links</h2>
+            <div className="admin-list">
+              {store.wholesale_tokens.length === 0 ? (
+                <div className="empty">No wholesale links yet.</div>
+              ) : (
+                store.wholesale_tokens.map((tok) => (
+                  <WholesaleTokenRow
+                    key={tok.id}
+                    token={tok}
+                    onToggle={async () => {
+                      try {
+                        const updated = await apiPatch(`/api/admin/wholesale/tokens/${tok.id}`, { active: !tok.active });
+                        setStore((prev) => ({ ...prev, wholesale_tokens: prev.wholesale_tokens.map((t) => t.id === tok.id ? updated : t) }));
+                        showToast(updated.active ? "Link activated." : "Link deactivated.");
+                      } catch (err) {
+                        showToast((err as Error).message, "error");
+                      }
+                    }}
+                    onDelete={async () => {
+                      if (!confirm(`Delete link for "${tok.name}"?`)) return;
+                      try {
+                        await apiDelete(`/api/admin/wholesale/tokens/${tok.id}`);
+                        setStore((prev) => ({ ...prev, wholesale_tokens: prev.wholesale_tokens.filter((t) => t.id !== tok.id) }));
+                        showToast("Deleted.");
+                      } catch (err) {
+                        showToast((err as Error).message, "error");
+                      }
+                    }}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Orders */}
+          <div className="admin-card">
+            <h2>Wholesale orders</h2>
+            <div className="admin-list">
+              {store.wholesale_orders.length === 0 ? (
+                <div className="empty">No orders yet.</div>
+              ) : (
+                store.wholesale_orders.map((order) => (
+                  <WholesaleOrderRow
+                    key={order.id}
+                    order={order}
+                    onStatusChange={async (status) => {
+                      try {
+                        const updated = await apiPatch(`/api/admin/wholesale/orders/${order.id}`, { status });
+                        setStore((prev) => ({ ...prev, wholesale_orders: prev.wholesale_orders.map((o) => o.id === order.id ? { ...o, ...updated } : o) }));
+                        showToast("Status updated.");
                       } catch (err) {
                         showToast((err as Error).message, "error");
                       }
