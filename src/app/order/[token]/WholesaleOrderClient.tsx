@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import type { StockItem } from "@/lib/seed-data";
 
+const PAGE_SIZE = 24;
+
 type Props = {
   token: string;
   accountName: string;
@@ -44,7 +46,6 @@ function PlantOrderCard({
       )}
       <div className="card-meta" style={{ marginBottom: "0.75rem" }}>
         {item.price && <span className="card-price">{item.price}</span>}
-        <span style={{ color: "#888", fontSize: "13px" }}>{item.stock} available</span>
       </div>
       <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
         <span style={{ fontSize: "13px", color: "#555", minWidth: "60px" }}>Qty:</span>
@@ -74,6 +75,7 @@ function PlantOrderCard({
 export default function WholesaleOrderClient({ token, accountName, accountEmail, items }: Props) {
   const [quantities, setQuantities] = useState<Quantities>({});
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
   const [buyerName, setBuyerName] = useState(accountName);
   const [buyerEmail, setBuyerEmail] = useState(accountEmail);
   const [buyerPhone, setBuyerPhone] = useState("");
@@ -98,6 +100,14 @@ export default function WholesaleOrderClient({ token, accountName, accountEmail,
     if (!activeCategory) return items;
     return items.filter((i) => i.category === activeCategory);
   }, [items, activeCategory]);
+
+  const visible = filtered.slice(0, page * PAGE_SIZE);
+  const hasMore = visible.length < filtered.length;
+
+  function selectCategory(cat: string | null) {
+    setActiveCategory(cat);
+    setPage(1);
+  }
 
   const selectedItems = useMemo(
     () => items.filter((i) => (quantities[i.id] ?? 0) > 0),
@@ -184,7 +194,7 @@ export default function WholesaleOrderClient({ token, accountName, accountEmail,
         <div className="filter-bar" role="group" aria-label="Filter by category" style={{ marginBottom: "1.5rem" }}>
           <button
             className={`filter-btn${activeCategory === null ? " active" : ""}`}
-            onClick={() => setActiveCategory(null)}
+            onClick={() => selectCategory(null)}
           >
             All ({items.length})
           </button>
@@ -194,7 +204,7 @@ export default function WholesaleOrderClient({ token, accountName, accountEmail,
               <button
                 key={cat}
                 className={`filter-btn${activeCategory === cat ? " active" : ""}`}
-                onClick={() => setActiveCategory(cat)}
+                onClick={() => selectCategory(cat)}
               >
                 {cat} ({count})
               </button>
@@ -203,11 +213,11 @@ export default function WholesaleOrderClient({ token, accountName, accountEmail,
         </div>
 
         {/* Plant grid */}
-        <div className="card-grid" style={{ marginBottom: "3rem" }}>
-          {filtered.length === 0 ? (
+        <div className="card-grid" aria-live="polite" style={!hasMore ? { marginBottom: "3rem" } : undefined}>
+          {visible.length === 0 ? (
             <div className="empty">Nothing in this category right now.</div>
           ) : (
-            filtered.map((item) => (
+            visible.map((item) => (
               <PlantOrderCard
                 key={item.id}
                 item={item}
@@ -217,6 +227,14 @@ export default function WholesaleOrderClient({ token, accountName, accountEmail,
             ))
           )}
         </div>
+
+        {hasMore && (
+          <div className="load-more-wrap" style={{ marginBottom: "3rem" }}>
+            <button className="btn btn-ghost" onClick={() => setPage((p) => p + 1)}>
+              Show more ({filtered.length - visible.length} remaining)
+            </button>
+          </div>
+        )}
 
         {/* Order summary + contact form */}
         <div style={{ maxWidth: "600px", margin: "0 auto" }}>
