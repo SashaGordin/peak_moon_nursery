@@ -130,18 +130,6 @@ function StockRow({
             placeholder="$5"
           />
         </label>
-        <label className="inline-field">
-          <span>Qty</span>
-          <input
-            type="number"
-            min="0"
-            value={stock}
-            onChange={(e) => setStock(e.target.value)}
-            onBlur={() => saveField("stock")}
-            onKeyDown={(e) => { if (e.key === "Enter") { (e.target as HTMLInputElement).blur(); } }}
-            placeholder="10"
-          />
-        </label>
       </div>
       <div className="row-actions">
         {moving ? (
@@ -339,10 +327,6 @@ function StockTab({
           <label>
             <span className="lbl">Price</span>
             <input name="price" placeholder="$5" defaultValue="$5" />
-          </label>
-          <label>
-            <span className="lbl">Quantity on bench</span>
-            <input name="stock" type="number" min="0" placeholder="10" defaultValue="10" />
           </label>
           <label className="field-full">
             <span className="lbl">Notes</span>

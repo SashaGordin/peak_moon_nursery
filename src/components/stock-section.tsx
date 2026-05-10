@@ -5,13 +5,6 @@ import type { StockItem } from "@/lib/seed-data";
 
 const PAGE_SIZE = 24;
 
-function StockBadge({ stock }: { stock?: number }) {
-  if (stock == null) return null;
-  if (stock <= 0) return <span className="card-stock-out">Sold out</span>;
-  if (stock <= 5) return <span className="card-stock-low">Only {stock} left</span>;
-  return <span>{stock} on the bench</span>;
-}
-
 function PlantCard({ item }: { item: StockItem }) {
   return (
     <article className="card">
@@ -32,7 +25,6 @@ function PlantCard({ item }: { item: StockItem }) {
       )}
       <div className="card-meta">
         {item.price && <span className="card-price">{item.price}</span>}
-        <StockBadge stock={item.stock} />
       </div>
     </article>
   );
