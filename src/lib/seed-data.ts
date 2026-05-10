@@ -10,6 +10,7 @@ export type StockItem = {
   mature_height?: string;
   days_to_maturity?: string;
   growth_type?: string;
+  image_url?: string | null;
 };
 
 export type ComingSoonItem = {

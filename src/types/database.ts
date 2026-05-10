@@ -148,6 +148,7 @@ export type Database = {
           description: string | null
           growth_type: string | null
           id: string
+          image_url: string | null
           mature_height: string | null
           name: string
           notes: string | null
@@ -162,6 +163,7 @@ export type Database = {
           description?: string | null
           growth_type?: string | null
           id?: string
+          image_url?: string | null
           mature_height?: string | null
           name: string
           notes?: string | null
@@ -176,6 +178,7 @@ export type Database = {
           description?: string | null
           growth_type?: string | null
           id?: string
+          image_url?: string | null
           mature_height?: string | null
           name?: string
           notes?: string | null

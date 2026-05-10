@@ -15,6 +15,11 @@ function StockBadge({ stock }: { stock?: number }) {
 function PlantCard({ item }: { item: StockItem }) {
   return (
     <article className="card">
+      {item.image_url && (
+        <div className="card-image">
+          <img src={item.image_url} alt={item.name} loading="lazy" />
+        </div>
+      )}
       <span className="card-tag">{item.category ?? "Available"}</span>
       <h3>{item.name}</h3>
       {item.variety && <p className="card-variety">{item.variety}</p>}
