@@ -4,7 +4,7 @@ export type StockItem = {
   variety?: string;
   notes?: string;
   price?: string;
-  stock?: number;
+  pot_size?: string | null;
   category?: string;
   description?: string;
   mature_height?: string;
@@ -68,12 +68,12 @@ export type WholesaleOrder = {
 
 export const seedData = {
   in_stock: [
-    { id: "s1", name: "Cherokee Purple Tomato", variety: "Heirloom · indeterminate", notes: "Smoky, sweet, big slicer. A bench favorite.", price: "$5", stock: 12, category: "Tomato" },
-    { id: "s2", name: "Sungold Tomato",          variety: "Cherry · indeterminate",   notes: "Candy-sweet orange cherries. Goes fast.",   price: "$5", stock: 4,  category: "Tomato" },
-    { id: "s3", name: "Genovese Basil",          variety: "Classic Italian",          notes: "Full sun, pinch the tops, eat well.",        price: "$4", stock: 24, category: "Herb"   },
-    { id: "s4", name: "Lacinato Kale",           variety: "Tuscan / 'dinosaur'",      notes: "Cold-hardy, productive all season.",         price: "$4", stock: 18, category: "Greens" },
-    { id: "s5", name: "Marigold 'Queen Sophia'", variety: "Annual flower",            notes: "Cheerful companion for tomatoes.",           price: "$4", stock: 30, category: "Flower" },
-    { id: "s6", name: "Costata Romanesco Squash", variety: "Italian zucchini",        notes: "Nutty, ribbed, unbeatable on the grill.",    price: "$5", stock: 6,  category: "Squash" },
+    { id: "s1", name: "Cherokee Purple Tomato", variety: "Heirloom · indeterminate", notes: "Smoky, sweet, big slicer. A bench favorite.", price: "$5", category: "Tomato" },
+    { id: "s2", name: "Sungold Tomato",          variety: "Cherry · indeterminate",   notes: "Candy-sweet orange cherries. Goes fast.",   price: "$5", category: "Tomato" },
+    { id: "s3", name: "Genovese Basil",          variety: "Classic Italian",          notes: "Full sun, pinch the tops, eat well.",        price: "$4", category: "Herb"   },
+    { id: "s4", name: "Lacinato Kale",           variety: "Tuscan / 'dinosaur'",      notes: "Cold-hardy, productive all season.",         price: "$4", category: "Greens" },
+    { id: "s5", name: "Marigold 'Queen Sophia'", variety: "Annual flower",            notes: "Cheerful companion for tomatoes.",           price: "$4", category: "Flower" },
+    { id: "s6", name: "Costata Romanesco Squash", variety: "Italian zucchini",        notes: "Nutty, ribbed, unbeatable on the grill.",    price: "$5", category: "Squash" },
   ] as StockItem[],
   coming_soon: [
     { id: "c1", name: "Sweet Peppers", variety: "Several varieties",             notes: "Hardening off now — bench-ready next week.", eta: "Next week" },

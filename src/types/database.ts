@@ -152,8 +152,8 @@ export type Database = {
           mature_height: string | null
           name: string
           notes: string | null
+          pot_size: string | null
           price: string | null
-          stock: number | null
           variety: string | null
         }
         Insert: {
@@ -167,8 +167,8 @@ export type Database = {
           mature_height?: string | null
           name: string
           notes?: string | null
+          pot_size?: string | null
           price?: string | null
-          stock?: number | null
           variety?: string | null
         }
         Update: {
@@ -182,8 +182,8 @@ export type Database = {
           mature_height?: string | null
           name?: string
           notes?: string | null
+          pot_size?: string | null
           price?: string | null
-          stock?: number | null
           variety?: string | null
         }
         Relationships: []

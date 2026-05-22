@@ -25,7 +25,6 @@ export default async function WholesaleOrderPage({ params }: { params: { token: 
   const { data: stockItems } = await supabaseAdmin
     .from("stock_items")
     .select("*")
-    .gt("stock", 0)
     .order("category")
     .order("name");
 

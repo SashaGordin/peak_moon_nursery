@@ -96,7 +96,6 @@ function StockRow({
   onMove: (id: string, eta: string) => void;
 }) {
   const [price, setPrice] = useState(item.price ?? "");
-  const [stock, setStock] = useState(String(item.stock ?? ""));
   const [menuOpen, setMenuOpen] = useState(false);
   const [moving, setMoving] = useState(false);
   const [eta, setEta] = useState("");
@@ -113,9 +112,8 @@ function StockRow({
     return () => document.removeEventListener("mousedown", handleClick);
   }, [menuOpen]);
 
-  function saveField(field: "price" | "stock") {
-    const val = field === "stock" ? (stock === "" ? null : Number(stock)) : (price || null);
-    onUpdate(item.id, { [field]: val });
+  function saveField(field: "price") {
+    onUpdate(item.id, { [field]: price || null } as Partial<StockItem>);
   }
 
   return (
@@ -285,7 +283,6 @@ function StockTab({
               days_to_maturity: (fd.get("days_to_maturity") as string) || null,
               growth_type: (fd.get("growth_type") as string) || null,
               price: (fd.get("price") as string) || "$5",
-              stock: fd.get("stock") ? Number(fd.get("stock")) : 10,
               notes: (fd.get("notes") as string) || null,
             };
             try {

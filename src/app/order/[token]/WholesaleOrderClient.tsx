@@ -52,7 +52,6 @@ function PlantOrderCard({
         <input
           type="number"
           min={0}
-          max={item.stock}
           value={qty}
           onChange={(e) => onChange(item.id, Math.max(0, parseInt(e.target.value) || 0))}
           style={{

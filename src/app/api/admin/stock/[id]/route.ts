@@ -9,8 +9,9 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 
   const body = await req.json();
   const allowed: (keyof TablesUpdate<"stock_items">)[] = [
-    "price", "stock", "notes", "name", "category", "variety",
+    "price", "notes", "name", "category", "variety",
     "description", "mature_height", "days_to_maturity", "growth_type",
+    "pot_size",
   ];
   const update: TablesUpdate<"stock_items"> = {};
   for (const key of allowed) {
