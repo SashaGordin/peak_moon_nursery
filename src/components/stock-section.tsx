@@ -7,13 +7,15 @@ const PAGE_SIZE = 24;
 
 function PlantCard({ item }: { item: StockItem }) {
   return (
-    <article className="card">
+    <article className={`card${item.sold_out ? " sold-out" : ""}`}>
       {item.image_url && (
         <div className="card-image">
           <img src={item.image_url} alt={item.name} loading="lazy" />
         </div>
       )}
-      <span className="card-tag">{item.category ?? "Available"}</span>
+      <span className={`card-tag${item.sold_out ? " card-tag-soldout" : ""}`}>
+        {item.sold_out ? "Sold out" : (item.category ?? "Available")}
+      </span>
       <h3>{item.name}</h3>
       {item.variety && <p className="card-variety">{item.variety}</p>}
       {item.description && <p className="card-notes">{item.description}</p>}

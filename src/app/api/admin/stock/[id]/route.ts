@@ -11,7 +11,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   const allowed: (keyof TablesUpdate<"stock_items">)[] = [
     "price", "notes", "name", "category", "variety",
     "description", "mature_height", "days_to_maturity", "growth_type",
-    "pot_size",
+    "pot_size", "sold_out",
   ];
   const update: TablesUpdate<"stock_items"> = {};
   for (const key of allowed) {

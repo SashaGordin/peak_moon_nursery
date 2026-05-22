@@ -12,6 +12,7 @@ export type StockItem = {
   growth_type?: string;
   image_url?: string | null;
   section: "in_stock" | "wholesale";
+  sold_out?: boolean;
 };
 
 export type ComingSoonItem = {

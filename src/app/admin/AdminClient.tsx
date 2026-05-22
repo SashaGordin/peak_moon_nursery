@@ -121,10 +121,11 @@ function StockRow({
   }
 
   return (
-    <div className="admin-row stock-row">
+    <div className={`admin-row stock-row${item.sold_out ? " sold-out" : ""}`}>
       <div className="row-name">
         {item.name}
         {item.category && <em>{item.category}</em>}
+        {item.sold_out && <span className="sold-out-badge">Sold out</span>}
       </div>
       <div className="muted" style={{ fontSize: 13 }}>{item.description ? item.description.slice(0, 80) + (item.description.length > 80 ? "…" : "") : ""}</div>
       <div className="inline-fields">
@@ -137,6 +138,14 @@ function StockRow({
             onKeyDown={(e) => { if (e.key === "Enter") { (e.target as HTMLInputElement).blur(); } }}
             placeholder="$5"
           />
+        </label>
+        <label className="inline-field inline-check">
+          <input
+            type="checkbox"
+            checked={!!item.sold_out}
+            onChange={(e) => onUpdate(item.id, { sold_out: e.target.checked })}
+          />
+          <span>Sold out</span>
         </label>
       </div>
       <div className="row-actions">

@@ -155,6 +155,7 @@ export type Database = {
           pot_size: string | null
           price: string | null
           section: string
+          sold_out: boolean
           variety: string | null
         }
         Insert: {
@@ -171,6 +172,7 @@ export type Database = {
           pot_size?: string | null
           price?: string | null
           section?: string
+          sold_out?: boolean
           variety?: string | null
         }
         Update: {
@@ -187,6 +189,7 @@ export type Database = {
           pot_size?: string | null
           price?: string | null
           section?: string
+          sold_out?: boolean
           variety?: string | null
         }
         Relationships: []

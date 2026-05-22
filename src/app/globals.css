@@ -336,6 +336,9 @@ button.btn { font-family: inherit; }
 .card .card-price { color: var(--forest); font-weight: 600; }
 .card .card-stock-low { color: var(--terracotta); font-weight: 600; }
 .card .card-stock-out { color: var(--ink-soft); text-decoration: line-through; }
+.card.sold-out { opacity: 0.55; }
+.card.sold-out:hover { transform: none; box-shadow: none; }
+.card .card-tag-soldout { color: var(--terracotta); }
 
 .card-grid-soft .card {
   background: rgba(255, 253, 247, 0.7);
@@ -745,6 +748,39 @@ button.btn { font-family: inherit; }
 .inline-field input:focus {
   border-color: var(--terracotta);
   box-shadow: 0 0 0 2px rgba(184, 92, 58, 0.18);
+}
+.inline-field.inline-check {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  padding-top: 14px;
+}
+.inline-field.inline-check input {
+  width: auto;
+  padding: 0;
+  margin: 0;
+}
+.inline-field.inline-check span {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.admin-row.sold-out { opacity: 0.65; }
+.sold-out-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--terracotta);
+  color: #fff;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  vertical-align: middle;
 }
 
 .move-eta {
