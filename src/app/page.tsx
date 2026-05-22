@@ -48,7 +48,7 @@ function EventRow({ event }: { event: EventItem }) {
 
 export default async function HomePage() {
   const [stockResult, comingResult, eventsResult, settingsResult] = await Promise.all([
-    supabaseAdmin.from("stock_items").select("*").order("created_at", { ascending: false }),
+    supabaseAdmin.from("stock_items").select("*").eq("section", "in_stock").order("created_at", { ascending: false }),
     supabaseAdmin.from("coming_soon_items").select("*").order("created_at"),
     supabaseAdmin.from("events").select("*").order("date"),
     supabaseAdmin.from("site_settings").select("*").single(),

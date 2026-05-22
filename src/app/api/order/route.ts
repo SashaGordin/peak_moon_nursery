@@ -108,10 +108,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid or inactive link" }, { status: 403 });
   }
 
-  // Re-fetch item details from DB — never trust client-supplied name/category/price
+  // Re-fetch item details from DB — never trust client-supplied name/category/price.
+  // Restrict to wholesale items so non-wholesale ids can't be ordered through this form.
   const { data: dbItems } = await supabaseAdmin
     .from("stock_items")
     .select("id, name, category, price")
+    .eq("section", "wholesale")
     .in("id", Array.from(requestedMap.keys()));
 
   if (!dbItems || dbItems.length === 0) {

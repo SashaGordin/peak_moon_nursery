@@ -5,8 +5,9 @@ import type { StockItem, ComingSoonItem, EventItem, SignupItem, SiteSettings, Wh
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
-  const [stock, coming, events, settings, signups, tokens, orders] = await Promise.all([
-    supabaseAdmin.from("stock_items").select("*").order("created_at", { ascending: false }),
+  const [inStock, wholesaleStock, coming, events, settings, signups, tokens, orders] = await Promise.all([
+    supabaseAdmin.from("stock_items").select("*").eq("section", "in_stock").order("created_at", { ascending: false }),
+    supabaseAdmin.from("stock_items").select("*").eq("section", "wholesale").order("category").order("name"),
     supabaseAdmin.from("coming_soon_items").select("*").order("created_at"),
     supabaseAdmin.from("events").select("*").order("date"),
     supabaseAdmin.from("site_settings").select("*").single(),
@@ -33,7 +34,8 @@ export default async function AdminPage() {
 
   return (
     <AdminClient
-      initialStock={(stock.data ?? []) as StockItem[]}
+      initialStock={(inStock.data ?? []) as StockItem[]}
+      initialWholesaleStock={(wholesaleStock.data ?? []) as StockItem[]}
       initialComingSoon={(coming.data ?? []) as ComingSoonItem[]}
       initialEvents={(events.data ?? []) as EventItem[]}
       initialSettings={mappedSettings}

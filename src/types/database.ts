@@ -154,6 +154,7 @@ export type Database = {
           notes: string | null
           pot_size: string | null
           price: string | null
+          section: string
           variety: string | null
         }
         Insert: {
@@ -169,6 +170,7 @@ export type Database = {
           notes?: string | null
           pot_size?: string | null
           price?: string | null
+          section?: string
           variety?: string | null
         }
         Update: {
@@ -184,6 +186,7 @@ export type Database = {
           notes?: string | null
           pot_size?: string | null
           price?: string | null
+          section?: string
           variety?: string | null
         }
         Relationships: []

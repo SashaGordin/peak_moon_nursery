@@ -30,6 +30,7 @@ type TabId = "stock" | "coming" | "events" | "settings" | "signups" | "wholesale
 
 type Store = {
   in_stock: StockItem[];
+  wholesale_stock: StockItem[];
   coming_soon: ComingSoonItem[];
   events: EventItem[];
   signups: SignupItem[];
@@ -40,6 +41,7 @@ type Store = {
 
 type Props = {
   initialStock: StockItem[];
+  initialWholesaleStock: StockItem[];
   initialComingSoon: ComingSoonItem[];
   initialEvents: EventItem[];
   initialSettings: SiteSettings;
@@ -89,11 +91,13 @@ function StockRow({
   onUpdate,
   onDelete,
   onMove,
+  onCopyToWholesale,
 }: {
   item: StockItem;
   onUpdate: (id: string, patch: Partial<StockItem>) => void;
   onDelete: (id: string) => void;
   onMove: (id: string, eta: string) => void;
+  onCopyToWholesale?: (id: string) => void;
 }) {
   const [price, setPrice] = useState(item.price ?? "");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -172,6 +176,14 @@ function StockRow({
                 >
                   → Coming Soon
                 </button>
+                {onCopyToWholesale && (
+                  <button
+                    className="kebab-item"
+                    onClick={() => { setMenuOpen(false); onCopyToWholesale(item.id); }}
+                  >
+                    → Wholesale
+                  </button>
+                )}
                 <button
                   className="kebab-item danger"
                   onClick={() => {
@@ -264,17 +276,37 @@ function StockTab({
     }
   }
 
+  async function handleCopyToWholesale(id: string) {
+    const item = store.in_stock.find((i) => i.id === id);
+    if (!item) return;
+    try {
+      const created = await apiPost(`/api/admin/stock/${id}/copy-to-wholesale`, {});
+      setStore((prev) => ({
+        ...prev,
+        wholesale_stock: [created, ...prev.wholesale_stock],
+      }));
+      showToast(`Copied "${item.name}" to wholesale.`);
+    } catch (err) {
+      showToast((err as Error).message, "error");
+    }
+  }
+
   return (
     <section>
       <div className="admin-card">
-        <h2>Add a plant to the bench</h2>
-        <p className="hint">Anything saved here shows up on the public site.</p>
+        <h2>Add a plant</h2>
+        <p className="hint">Pick which section(s) it should appear in.</p>
         <form
           className="admin-form"
           onSubmit={async (e) => {
             e.preventDefault();
             const fd = new FormData(e.currentTarget);
             const form = e.currentTarget;
+            const sections = fd.getAll("sections").map(String);
+            if (sections.length === 0) {
+              showToast("Pick at least one section.", "error");
+              return;
+            }
             const body = {
               name: fd.get("name") as string,
               category: (fd.get("category") as string) || null,
@@ -284,12 +316,34 @@ function StockTab({
               growth_type: (fd.get("growth_type") as string) || null,
               price: (fd.get("price") as string) || "$5",
               notes: (fd.get("notes") as string) || null,
+              sections,
             };
             try {
-              const saved = await apiPost("/api/admin/stock", body);
-              setStore((prev) => ({ ...prev, in_stock: [saved, ...prev.in_stock] }));
-              showToast("Saved.");
-              form.reset();
+              const res = (await apiPost("/api/admin/stock", body)) as unknown as {
+                created: StockItem[];
+                conflicts: Array<"in_stock" | "wholesale">;
+              };
+              const createdInStock = res.created.filter((i) => i.section === "in_stock");
+              const createdWholesale = res.created.filter((i) => i.section === "wholesale");
+              setStore((prev) => ({
+                ...prev,
+                in_stock: [...createdInStock, ...prev.in_stock],
+                wholesale_stock: [...createdWholesale, ...prev.wholesale_stock],
+              }));
+              if (res.conflicts && res.conflicts.length > 0) {
+                const label = res.conflicts
+                  .map((s) => (s === "in_stock" ? "in-stock" : "wholesale"))
+                  .join(" and ");
+                showToast(
+                  res.created.length > 0
+                    ? `Saved. Skipped ${label} (already exists).`
+                    : `Already in ${label}.`,
+                  res.created.length > 0 ? "ok" : "error"
+                );
+              } else {
+                showToast("Saved.");
+              }
+              if (res.created.length > 0) form.reset();
             } catch (err) {
               showToast((err as Error).message, "error");
             }
@@ -335,6 +389,17 @@ function StockTab({
             <span className="lbl">Notes</span>
             <input name="notes" placeholder="Optional extra note for customers." />
           </label>
+          <fieldset className="field-full" style={{ border: "1px solid #e7e2d8", borderRadius: 6, padding: "10px 12px", margin: 0 }}>
+            <legend style={{ fontSize: 13, color: "#666", padding: "0 6px" }}>Show in</legend>
+            <label style={{ display: "inline-flex", alignItems: "center", gap: 6, marginRight: 16 }}>
+              <input type="checkbox" name="sections" value="in_stock" defaultChecked />
+              <span>In stock</span>
+            </label>
+            <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <input type="checkbox" name="sections" value="wholesale" />
+              <span>Wholesale</span>
+            </label>
+          </fieldset>
           <div className="form-actions">
             <button type="submit" className="btn">Save</button>
             <button type="reset" className="btn btn-secondary">Clear</button>
@@ -376,6 +441,7 @@ function StockTab({
                 onUpdate={handleUpdate}
                 onDelete={handleDelete}
                 onMove={handleMove}
+                onCopyToWholesale={handleCopyToWholesale}
               />
             ))
           )}
@@ -530,6 +596,7 @@ function Toast({ text, kind }: { text: string; kind: "ok" | "error" }) {
 
 export default function AdminClient({
   initialStock,
+  initialWholesaleStock,
   initialComingSoon,
   initialEvents,
   initialSettings,
@@ -545,6 +612,7 @@ export default function AdminClient({
 
   const [store, setStore] = useState<Store>({
     in_stock: initialStock,
+    wholesale_stock: initialWholesaleStock,
     coming_soon: initialComingSoon,
     events: [...initialEvents].sort((a, b) => a.date.localeCompare(b.date)),
     signups: initialSignups,
@@ -926,6 +994,48 @@ export default function AdminClient({
       {/* WHOLESALE TAB */}
       {activeTab === "wholesale" && (
         <section>
+          {/* Wholesale items */}
+          <div className="admin-card">
+            <h2>
+              Wholesale items
+              <span className="muted" style={{ fontSize: 16, fontWeight: 400, marginLeft: 10 }}>
+                ({store.wholesale_stock.length} plants)
+              </span>
+            </h2>
+            <p className="hint">
+              Only plants listed here show up on wholesale order links. Use the &ldquo;→ Wholesale&rdquo;
+              action on an in-stock row to copy it here, or use the add form on the In stock tab and check
+              &ldquo;Wholesale&rdquo;.
+            </p>
+            <div className="admin-list">
+              {store.wholesale_stock.length === 0 ? (
+                <div className="empty">No wholesale items yet.</div>
+              ) : (
+                store.wholesale_stock.map((item) => (
+                  <AdminRow
+                    key={item.id}
+                    primary={item.name}
+                    secondary={item.category}
+                    tertiary={item.price}
+                    badge={item.pot_size ?? ""}
+                    onDelete={async () => {
+                      try {
+                        await apiDelete(`/api/admin/stock/${item.id}`);
+                        setStore((prev) => ({
+                          ...prev,
+                          wholesale_stock: prev.wholesale_stock.filter((i) => i.id !== item.id),
+                        }));
+                        showToast("Removed from wholesale.");
+                      } catch (err) {
+                        showToast((err as Error).message, "error");
+                      }
+                    }}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+
           {/* Access Links */}
           <div className="admin-card">
             <h2>Wholesale access links</h2>
