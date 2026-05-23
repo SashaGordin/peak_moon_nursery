@@ -1,10 +1,15 @@
+import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase";
+import { getOwnerEmail } from "@/lib/owner-auth";
 import AdminClient from "./AdminClient";
 import type { StockItem, ComingSoonItem, EventItem, SignupItem, SiteSettings, WholesaleToken, WholesaleOrder } from "@/lib/seed-data";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
+  const ownerEmail = await getOwnerEmail();
+  if (!ownerEmail) redirect("/");
+
   const [inStock, wholesaleStock, coming, events, settings, signups, tokens, orders] = await Promise.all([
     supabaseAdmin.from("stock_items").select("*").eq("section", "in_stock").order("created_at", { ascending: false }),
     supabaseAdmin.from("stock_items").select("*").eq("section", "wholesale").order("category").order("name"),

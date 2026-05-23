@@ -1,6 +1,6 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { getOwnerEmail } from "@/lib/owner-auth";
 import type { TablesInsert } from "@/types/database";
 
 const VALID_SECTIONS = ["in_stock", "wholesale"] as const;
@@ -25,8 +25,8 @@ const ALLOWED_FIELDS: (keyof TablesInsert<"stock_items">)[] = [
 ];
 
 export async function POST(req: Request) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const email = await getOwnerEmail();
+  if (!email) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const body = await req.json();
   if (!body || typeof body !== "object") {
