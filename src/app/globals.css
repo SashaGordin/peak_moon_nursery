@@ -155,6 +155,13 @@ h3 { font-size: 22px; color: var(--forest-2); }
   height: auto;
   filter: drop-shadow(0 12px 24px rgba(70, 50, 20, 0.12));
 }
+.hero-art img {
+  width: 100%;
+  height: auto;
+  border-radius: 18px;
+  object-fit: cover;
+  box-shadow: 0 24px 64px rgba(10, 20, 10, 0.40);
+}
 
 /* ---------- Buttons ---------- */
 .btn {
@@ -231,6 +238,8 @@ button.btn { font-family: inherit; }
   border-radius: 4px;
   font-size: 11px;
 }
+.photo { overflow: hidden; }
+.photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .photo-1 { width: 62%; height: 70%; top: 0; left: 0; transform: rotate(-2deg); }
 .photo-2 { width: 50%; height: 56%; bottom: 0; right: 4%; transform: rotate(3deg); }
 .photo-3 { width: 38%; height: 42%; bottom: 18%; left: 8%; transform: rotate(-5deg); z-index: 2; }
@@ -851,6 +860,39 @@ button.btn { font-family: inherit; }
 .kebab-item:hover { background: var(--cream); }
 .kebab-item.danger { color: var(--terracotta); }
 .kebab-item.danger:hover { background: rgba(184, 92, 58, 0.06); }
+
+/* ---------- Photo Gallery Strip ---------- */
+.gallery-strip {
+  overflow: hidden;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--ink);
+}
+.gallery-scroll {
+  display: flex;
+  gap: 3px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  cursor: grab;
+}
+.gallery-scroll:active { cursor: grabbing; }
+.gallery-scroll::-webkit-scrollbar { display: none; }
+.gallery-thumb {
+  flex: 0 0 auto;
+  width: 260px;
+  height: 210px;
+  overflow: hidden;
+}
+.gallery-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  opacity: 0.88;
+}
+.gallery-thumb:hover img { transform: scale(1.05); opacity: 1; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 880px) {

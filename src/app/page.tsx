@@ -111,43 +111,12 @@ export default async function HomePage() {
                 </a>
               </div>
             </div>
-            <div className="hero-art" aria-hidden="true">
-              <svg viewBox="0 0 400 480" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <radialGradient id="moon" cx="50%" cy="40%" r="50%">
-                    <stop offset="0%" stopColor="#fbf3df" />
-                    <stop offset="100%" stopColor="#e8d9b3" />
-                  </radialGradient>
-                </defs>
-                <circle cx="270" cy="150" r="95" fill="url(#moon)" />
-                <circle cx="245" cy="135" r="6" fill="#d8c79e" opacity=".6" />
-                <circle cx="295" cy="170" r="9" fill="#d8c79e" opacity=".5" />
-                <circle cx="280" cy="115" r="4" fill="#d8c79e" opacity=".5" />
-                <path d="M120 460 C 130 360, 140 280, 130 180" stroke="#3d5a3f" strokeWidth="3" fill="none" />
-                <path d="M200 460 C 210 380, 220 320, 215 240" stroke="#3d5a3f" strokeWidth="3" fill="none" />
-                <path d="M80 460 C 90 400, 95 340, 85 290" stroke="#3d5a3f" strokeWidth="3" fill="none" />
-                <g fill="#5b8158">
-                  <path d="M130 320 C 95 300, 85 270, 100 250 C 125 260, 135 285, 130 320 Z" />
-                  <path d="M130 260 C 160 250, 175 225, 165 200 C 140 205, 125 230, 130 260 Z" />
-                  <path d="M215 360 C 180 350, 165 320, 180 300 C 205 305, 220 330, 215 360 Z" />
-                  <path d="M215 290 C 245 280, 260 255, 250 230 C 225 235, 210 260, 215 290 Z" />
-                  <path d="M85 380 C 60 370, 50 345, 60 325 C 80 330, 92 355, 85 380 Z" />
-                </g>
-                <g>
-                  <circle cx="125" cy="180" r="14" fill="#c25b3a" />
-                  <circle cx="118" cy="175" r="3" fill="#e2876a" opacity=".7" />
-                  <path d="M120 168 l3 -6 l3 4 l4 -3 l1 6" stroke="#3d5a3f" strokeWidth="1.5" fill="none" />
-                </g>
-                <g>
-                  <circle cx="215" cy="240" r="12" fill="#c25b3a" />
-                  <path d="M210 230 l3 -5 l3 3 l3 -3" stroke="#3d5a3f" strokeWidth="1.5" fill="none" />
-                </g>
-                <g>
-                  <path d="M85 290 C 78 305, 78 320, 85 330 C 92 320, 92 305, 85 290 Z" fill="#d97441" />
-                  <path d="M82 290 l3 -5 l4 4" stroke="#3d5a3f" strokeWidth="1.5" fill="none" />
-                </g>
-                <path d="M20 462 Q 200 470 380 458" stroke="#8a6f4b" strokeWidth="2" fill="none" opacity=".5" />
-              </svg>
+            <div className="hero-art">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/moonlit-greenhouse.jpg"
+                alt="Peak Moon Nursery greenhouses at dusk, moon rising above the island firs"
+              />
             </div>
           </div>
         </section>
@@ -156,26 +125,17 @@ export default async function HomePage() {
         <section className="story">
           <div className="wrap story-inner">
             <div className="story-photos">
-              <div className="photo photo-1" data-photo-slot="story-1" aria-label="Photo placeholder">
-                <span className="photo-placeholder">
-                  drop a photo here
-                  <br />
-                  <code>images/story-1.jpg</code>
-                </span>
+              <div className="photo photo-1">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/seeding-with-kash.jpg" alt="Keaton and baby Kash seeding trays in the greenhouse" />
               </div>
-              <div className="photo photo-2" data-photo-slot="story-2" aria-label="Photo placeholder">
-                <span className="photo-placeholder">
-                  drop a photo here
-                  <br />
-                  <code>images/story-2.jpg</code>
-                </span>
+              <div className="photo photo-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/greenhouse-portrait.jpg" alt="Selena and Keaton in their greenhouse surrounded by hundreds of plant starts" />
               </div>
-              <div className="photo photo-3" data-photo-slot="story-3" aria-label="Photo placeholder">
-                <span className="photo-placeholder">
-                  drop a photo here
-                  <br />
-                  <code>images/story-3.jpg</code>
-                </span>
+              <div className="photo photo-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/family.jpg" alt="Selena, Keaton, and Kash on the Vashon ferry" />
               </div>
             </div>
             <div className="story-copy">
@@ -196,6 +156,27 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+
+        {/* PHOTO GALLERY STRIP */}
+        <div className="gallery-strip" aria-hidden="true">
+          <div className="gallery-scroll">
+            {[
+              { src: "/images/gallery/flower-sunflower.jpg", alt: "Unusual bi-color sunflower variety" },
+              { src: "/images/gallery/nursery-bench.jpg", alt: "The nursery bench in the forest clearing" },
+              { src: "/images/gallery/hand-tomatoes.jpg", alt: "Hand holding a mix of colorful cherry tomatoes" },
+              { src: "/images/gallery/pepper-harvest.jpg", alt: "A rainbow of pepper and eggplant varieties at harvest" },
+              { src: "/images/gallery/tomato-toast.jpg", alt: "Open-face toast with sliced heirloom tomatoes and dill" },
+              { src: "/images/gallery/bowl-tomatoes.jpg", alt: "Bowl of mixed heirloom tomatoes" },
+              { src: "/images/gallery/harvest-tray.jpg", alt: "A full harvest tray of tomatoes, cucumbers, and beans" },
+              { src: "/images/gallery/tomatoes-spread.jpg", alt: "Fifteen-plus tomato varieties spread out on a deck" },
+            ].map((img) => (
+              <div key={img.src} className="gallery-thumb">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={img.src} alt={img.alt} loading="lazy" />
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* IN STOCK */}
         <section id="stock" className="section section-stock">
