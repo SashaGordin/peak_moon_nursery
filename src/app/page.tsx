@@ -114,7 +114,7 @@ export default async function HomePage() {
             <div className="hero-art">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/gallery/nursery-bench.jpg"
+                src="/images/nursery-bench-hero.jpg"
                 alt="Rows of vegetable starts on wooden benches in the forest-clearing nursery on Vashon Island"
               />
             </div>
