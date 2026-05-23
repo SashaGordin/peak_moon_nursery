@@ -863,25 +863,35 @@ button.btn { font-family: inherit; }
 
 /* ---------- Photo Gallery Strip ---------- */
 .gallery-strip {
+  position: relative;
   overflow: hidden;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
   background: var(--ink);
 }
-.gallery-scroll {
-  display: flex;
-  gap: 3px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  cursor: grab;
+.gallery-strip::before,
+.gallery-strip::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 64px;
+  z-index: 2;
+  pointer-events: none;
 }
-.gallery-scroll:active { cursor: grabbing; }
-.gallery-scroll::-webkit-scrollbar { display: none; }
+.gallery-strip::before { left: 0; background: linear-gradient(to right, var(--ink), transparent); }
+.gallery-strip::after { right: 0; background: linear-gradient(to left, var(--ink), transparent); }
+.gallery-track {
+  display: flex;
+  width: max-content;
+  animation: gallery-marquee 80s linear infinite;
+}
+.gallery-strip:hover .gallery-track { animation-play-state: paused; }
 .gallery-thumb {
   flex: 0 0 auto;
   width: 260px;
   height: 210px;
+  margin-right: 3px;
   overflow: hidden;
 }
 .gallery-thumb img {
@@ -893,6 +903,13 @@ button.btn { font-family: inherit; }
   opacity: 0.88;
 }
 .gallery-thumb:hover img { transform: scale(1.05); opacity: 1; }
+@keyframes gallery-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gallery-track { animation: none; }
+}
 
 /* ---------- Responsive ---------- */
 @media (max-width: 880px) {
@@ -912,6 +929,9 @@ button.btn { font-family: inherit; }
   .admin-row { grid-template-columns: 1fr; gap: 6px; padding: 14px; }
   .admin-row .row-actions { justify-content: flex-start; }
   .event { grid-template-columns: 70px 1fr; gap: 14px; padding: 16px; }
+  .gallery-thumb { width: 200px; height: 160px; }
+  .gallery-strip::before,
+  .gallery-strip::after { width: 40px; }
 }
 
 @media (max-width: 520px) {
@@ -919,4 +939,7 @@ button.btn { font-family: inherit; }
   h1 { font-size: 38px; }
   .hero-cta { flex-direction: column; align-items: stretch; }
   .hero-cta .btn { text-align: center; }
+  .gallery-thumb { width: 150px; height: 120px; }
+  .gallery-strip::before,
+  .gallery-strip::after { width: 28px; }
 }

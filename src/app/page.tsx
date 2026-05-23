@@ -159,22 +159,25 @@ export default async function HomePage() {
 
         {/* PHOTO GALLERY STRIP */}
         <div className="gallery-strip" aria-hidden="true">
-          <div className="gallery-scroll">
-            {[
-              { src: "/images/gallery/flower-sunflower.jpg", alt: "Unusual bi-color sunflower variety" },
-              { src: "/images/gallery/nursery-bench.jpg", alt: "The nursery bench in the forest clearing" },
-              { src: "/images/gallery/hand-tomatoes.jpg", alt: "Hand holding a mix of colorful cherry tomatoes" },
-              { src: "/images/gallery/pepper-harvest.jpg", alt: "A rainbow of pepper and eggplant varieties at harvest" },
-              { src: "/images/gallery/tomato-toast.jpg", alt: "Open-face toast with sliced heirloom tomatoes and dill" },
-              { src: "/images/gallery/bowl-tomatoes.jpg", alt: "Bowl of mixed heirloom tomatoes" },
-              { src: "/images/gallery/harvest-tray.jpg", alt: "A full harvest tray of tomatoes, cucumbers, and beans" },
-              { src: "/images/gallery/tomatoes-spread.jpg", alt: "Fifteen-plus tomato varieties spread out on a deck" },
-            ].map((img) => (
-              <div key={img.src} className="gallery-thumb">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={img.src} alt={img.alt} loading="lazy" />
-              </div>
-            ))}
+          <div className="gallery-track">
+            {(() => {
+              const galleryImages = [
+                { src: "/images/gallery/flower-sunflower.jpg", alt: "Unusual bi-color sunflower variety" },
+                { src: "/images/gallery/nursery-bench.jpg", alt: "The nursery bench in the forest clearing" },
+                { src: "/images/gallery/hand-tomatoes.jpg", alt: "Hand holding a mix of colorful cherry tomatoes" },
+                { src: "/images/gallery/pepper-harvest.jpg", alt: "A rainbow of pepper and eggplant varieties at harvest" },
+                { src: "/images/gallery/tomato-toast.jpg", alt: "Open-face toast with sliced heirloom tomatoes and dill" },
+                { src: "/images/gallery/bowl-tomatoes.jpg", alt: "Bowl of mixed heirloom tomatoes" },
+                { src: "/images/gallery/harvest-tray.jpg", alt: "A full harvest tray of tomatoes, cucumbers, and beans" },
+                { src: "/images/gallery/tomatoes-spread.jpg", alt: "Fifteen-plus tomato varieties spread out on a deck" },
+              ];
+              return [...galleryImages, ...galleryImages].map((img, i) => (
+                <div key={`${img.src}-${i}`} className="gallery-thumb">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={img.src} alt={img.alt} loading="lazy" />
+                </div>
+              ));
+            })()}
           </div>
         </div>
 
