@@ -292,13 +292,13 @@ export default function WholesaleOrderClient({ token, accountName, accountEmail,
             </label>
 
             <label style={{ display: "block", marginBottom: "1rem" }}>
-              <span style={{ fontSize: "13px", color: "#555", display: "block", marginBottom: "4px" }}>Notes (optional)</span>
+              <span style={{ fontSize: "13px", color: "#555", display: "block", marginBottom: "4px" }}>Notes or Special Orders (optional)</span>
               <textarea
                 value={orderNotes}
                 onChange={(e) => setOrderNotes(e.target.value)}
                 rows={3}
                 maxLength={2000}
-                placeholder="Anything we should know — preferred pickup time, substitutions, etc."
+                placeholder="Notes or special order requests — e.g. a variety not listed above, preferred pickup time, substitutions, etc."
                 style={{ width: "100%", padding: "8px 10px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "14px", resize: "vertical", boxSizing: "border-box" }}
               />
             </label>
