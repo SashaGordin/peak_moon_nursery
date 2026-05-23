@@ -929,7 +929,7 @@ export default function AdminClient({
                 <span className="lbl">Hours</span>
                 <input
                   name="hours"
-                  placeholder="Saturdays & Sundays, 10am–4pm"
+                  placeholder="Open daylight hours, mid-March through end of June"
                   defaultValue={store.settings.hours}
                 />
               </label>

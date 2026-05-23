@@ -59,7 +59,7 @@ export default async function HomePage() {
   const events = (eventsResult.data ?? []) as EventItem[];
   const s = settingsResult.data;
   const settings = {
-    hours: s?.hours ?? "Saturdays & Sundays, 10am–4pm",
+    hours: s?.hours ?? "Open daylight hours, mid-March through end of June",
     stockUpdatedAt: s?.stock_updated_at ?? null,
   };
 
@@ -287,11 +287,11 @@ export default async function HomePage() {
                 </div>
                 <div>
                   <dt>Hours</dt>
-                  <dd>
-                    {settings.hours}
-                    <br />
-                    <span className="muted">(seasonal — check our Instagram for updates)</span>
-                  </dd>
+                  <dd>{settings.hours}</dd>
+                </div>
+                <div>
+                  <dt>Payment</dt>
+                  <dd>Cash, check, or Venmo</dd>
                 </div>
                 <div>
                   <dt>Contact</dt>
