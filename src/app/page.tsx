@@ -67,25 +67,13 @@ export default async function HomePage() {
     <>
       <header className="site-header">
         <div className="wrap header-inner">
-          <a href="#top" className="brand">
-            <svg className="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
-              <circle cx="32" cy="32" r="22" fill="none" stroke="currentColor" strokeWidth="2" />
-              <path
-                d="M44 24c-6 2-10 8-10 14 0 5 3 10 8 12-9-1-16-9-16-18 0-7 5-13 12-15 2 2 4 4 6 7z"
-                fill="currentColor"
-              />
-              <path
-                d="M20 44c4-2 7-4 10-7"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                fill="none"
-                strokeLinecap="round"
-              />
-            </svg>
-            <span className="brand-text">
-              <span className="brand-name">Peak Moon</span>
-              <span className="brand-sub">Nursery · Vashon Island</span>
-            </span>
+          <a href="#top" className="brand" aria-label="Peak Moon Nursery — home">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="brand-logo"
+              src="/images/logo.png"
+              alt="Peak Moon Nursery — Edible Plant Starts"
+            />
           </a>
           <nav className="nav" aria-label="Primary">
             <a href="#stock">In Stock</a>
@@ -342,6 +330,14 @@ export default async function HomePage() {
                     If you reach SW 288th St, you&apos;ve gone slightly too far — turn around.
                   </li>
                 </ol>
+                <figure className="sign-photo">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/images/sign.jpg"
+                    alt="Peak Moon Nursery roadside sign — wooden sign reading 'Peak Moon Nursery — Edible Plant Starts'"
+                  />
+                  <figcaption>Look for this sign on the left side of the road.</figcaption>
+                </figure>
               </div>
             </div>
             <div className="visit-map">

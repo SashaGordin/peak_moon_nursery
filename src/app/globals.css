@@ -108,23 +108,16 @@ h3 { font-size: 22px; color: var(--forest-2); }
   text-decoration: none;
   color: var(--forest);
 }
-.brand-mark {
-  width: 38px;
-  height: 38px;
-  color: var(--forest);
+.brand-logo {
+  display: block;
+  height: 56px;
+  width: auto;
 }
-.brand-text { display: flex; flex-direction: column; line-height: 1.1; }
 .brand-name {
   font-family: var(--serif);
   font-size: 22px;
   font-weight: 600;
   letter-spacing: 0.01em;
-}
-.brand-sub {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: var(--ink-soft);
 }
 .nav { display: flex; gap: 22px; flex-wrap: wrap; }
 .nav a {
@@ -394,6 +387,28 @@ button.btn { font-family: inherit; }
 .directions h3 { margin-bottom: 12px; }
 .directions ol { padding-left: 20px; margin: 0; }
 .directions li { margin-bottom: 8px; }
+.sign-photo {
+  margin: 20px 0 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  background: var(--cream-2);
+}
+.sign-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 360px;
+  object-fit: cover;
+}
+.sign-photo figcaption {
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--ink-soft, #555);
+  border-top: 1px solid var(--line);
+  background: var(--cream);
+}
 
 .map-frame {
   border-radius: var(--radius);
