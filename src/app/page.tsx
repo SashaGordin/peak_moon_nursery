@@ -114,8 +114,8 @@ export default async function HomePage() {
             <div className="hero-art">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/moonlit-greenhouse.jpg"
-                alt="Peak Moon Nursery greenhouses at dusk, moon rising above the island firs"
+                src="/images/gallery/nursery-bench.jpg"
+                alt="Rows of vegetable starts on wooden benches in the forest-clearing nursery on Vashon Island"
               />
             </div>
           </div>
@@ -163,7 +163,6 @@ export default async function HomePage() {
             {(() => {
               const galleryImages = [
                 { src: "/images/gallery/flower-sunflower.jpg", alt: "Unusual bi-color sunflower variety" },
-                { src: "/images/gallery/nursery-bench.jpg", alt: "The nursery bench in the forest clearing" },
                 { src: "/images/gallery/hand-tomatoes.jpg", alt: "Hand holding a mix of colorful cherry tomatoes" },
                 { src: "/images/gallery/pepper-harvest.jpg", alt: "A rainbow of pepper and eggplant varieties at harvest" },
                 { src: "/images/gallery/tomato-toast.jpg", alt: "Open-face toast with sliced heirloom tomatoes and dill" },
