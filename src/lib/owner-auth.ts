@@ -5,6 +5,7 @@ export const OWNER_EMAILS = [
   "sligrano@gmail.com",
   "keatonfreeman@gmail.com",
   "sashagordin22@gmail.com",
+  "eugenevgordin@gmail.com",
 ] as const;
 
 export function isOwnerEmail(email: string | null | undefined): boolean {
